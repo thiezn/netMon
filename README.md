@@ -1,2 +1,22 @@
 # netMon
-a Distributed Network Monitoring Solution using the leaf-spine model. Leaf nodes running on low-cost hardware (rasberry pi's only at the moment) that are able to launch various network probes to give an overview of the health of the network. Spine nodes are running in the main datacentres having the same probes as leafs but also run network services used by the leafs like iperf.
+A Distributed Network Monitoring Solution using locally deployed nodes. 
+
+Nodes running on low-cost hardware (e.g. rasberry pi's) or docker containers running various network probes providing insight into the health of the network.
+
+Main features are:
+- Full mesh node network providing
+  - latency between nodes
+  - network path between nodes
+  - detecting routing and latency changes between the nodes
+  - extensible through addon modules
+  - HTTP/HTTPS probes
+  - DNS probes
+  - bandwidth probes
+- Central control plane
+  - collecting node performance data
+  - distributing probe configuration
+  - network/node overview
+  - reports with fancy pants graphs
+  - node health status
+  - web based interface
+- RESTful API

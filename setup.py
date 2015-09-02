@@ -9,7 +9,4 @@ setup(name='netMon',
       author_email='mathijs@mortimer.nl',
       url='https://github.com/thiezn/netMon',
       packages=['netMon'],
-      install_requires=[
-          'Twisted==15.2.1'
-          ]
-      )
+      install_requires=[])
