@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+from jobs import Job
 
-class IcmpProbe:
+
+class IcmpProbe(Job):
     """ ICMP probe (a.k.a ping) """
 
     def __init__(self, dest='127.0.0.1', count=10):

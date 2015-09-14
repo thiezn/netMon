@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from time import sleep
+import time
 from modules.icmp_probe.icmp_probe import IcmpProbe
 from modules.trace_probe.trace_probe import TraceProbe
-from job_handler import Job, JobHandler
+from jobs import JobScheduler
 
 
 class Node:
@@ -24,14 +24,16 @@ def main():
     icmp_probe = IcmpProbe("10.0.0.1")
     trace_probe = TraceProbe("213.46.237.24")
 
-    job_handler = JobHandler()
+    print icmp_probe.run()
+    print trace_probe.run()
 
-    job_handler.add(Job(trace_probe), "now")
-    job_handler.add(Job(icmp_probe), "now")
-    job_handler.run()   # need to implement threading for this
+    scheduler = JobScheduler()
+    for i in range(10):
+        time.sleep(1)
+        print("Adding job to job queue")
+        scheduler.add(icmp_probe)
+        scheduler.add(trace_probe)
 
-    sleep(5)
-    job_handler.add(Job(trace_probe), "now")
 
 if __name__ == '__main__':
     main()
