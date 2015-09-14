@@ -11,6 +11,10 @@ class IcmpProbe:
         self._max = 0
         self._avg = 0
 
+    def __repr__(self):
+        """ print out the job type when printing the object """
+        return "ICMP to %s" % self.dest
+
     def run(self):
         """ Starts the ICMP poll
         returns the last known min/max/avg response in ms """

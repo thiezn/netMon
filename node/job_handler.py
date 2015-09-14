@@ -1,35 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import time
-from datetime import datetime
-
-class Job:
-    """ A Job that can be scheduled by the JobHandler class """
-
-    def __init__(self, job_name="Job Doe"):
-        self.interval = None    # Run every <interval> seconds
-        self.last_run = None
-        self.next_run = None
-        self.job_name = job_name
-
-    def run(self):
-        print("%s Running job %s" % (self.last_run, self.job_name))
+from threading import Thread
+import Queue
 
 
-class JobHandler:
-    """ Class that handles scheduled jobs """
+def job_scheduler(job_queue):
+    time.sleep(5)
+    while not job_queue.empty():
+        print(job_queue.get())
+        time.sleep(1)
 
-    def __init__(self):
-        """ Loading available modules and setting up logging """
-        self.jobs = []
+job_queue = Queue.Queue()
 
-    def add(self, job, run_at):
-        """ Add a job to the queue """
-        self.jobs.append(job)
+job_scheduler_thread = Thread(target=job_scheduler, args=(job_queue, ))
+job_scheduler_thread.start()
 
-    def run(self):
-        while True:
-            for job in self.jobs:
-                job.last_run = datetime.now()
-                job.run()
-                time.sleep(1)
+for i in range(10):
+    time.sleep(1)
+    print("Adding job to job queue")
+    job_queue.put("Hello World")
