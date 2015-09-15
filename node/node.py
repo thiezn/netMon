@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from sys import exit
 import time
-from modules.icmp_probe.icmp_probe import IcmpProbe
 from modules.trace_probe.trace_probe import TraceProbe
 from jobs import JobScheduler
 
@@ -11,29 +11,27 @@ class Node:
 
     def __init__(self):
         """ Loading available modules and setting up logging """
-        pass
+        self.scheduler = JobScheduler()
 
     def run(self):
         """ Start the main program loop """
-        pass
+        try:
+            while True:
+                time.sleep(1)
+                print("Adding traceprobe job to queue")
+                self.scheduler.add(TraceProbe("213.46.237.24"))
+
+        except KeyboardInterrupt:
+            print("\nTHanks for joining!")
+            exit()
 
 
 def main():
     """ Main program logic called when node.py is run directly """
 
-    icmp_probe = IcmpProbe("10.0.0.1")
-    trace_probe = TraceProbe("213.46.237.24")
+    node = Node()
 
-    print icmp_probe.run()
-    print trace_probe.run()
-
-    scheduler = JobScheduler()
-    for i in range(10):
-        time.sleep(1)
-        print("Adding job to job queue")
-        scheduler.add(icmp_probe)
-        scheduler.add(trace_probe)
-
+    node.run()
 
 if __name__ == '__main__':
     main()

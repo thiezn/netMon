@@ -1,14 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from threading import Thread
-import Queue
+from datetime import datetime
+import queue
 
 
 class Job:
     """ Class describing a Job for use in the JobScheduler """
-    def __init__(self):
-        pass
-
     def run(self):
         """ Runs the specified job
         each job type has to overload this function """
@@ -18,11 +16,19 @@ class Job:
 class JobScheduler:
 
     def __init__(self):
-        self._job_queue = Queue.Queue()
+        # Create a job queue and start the scheduler in a seperate thread
+        self._job_queue = queue.Queue()
         self._scheduler_thread = Thread(target=self._job_scheduler,
                                         args=(self._job_queue, ))
         self._scheduler_thread.daemon = True
         self._scheduler_thread.start()
+
+    def __repr__(self):
+        """ Print the current queue contents """
+        if not self._job_queue.empty():
+            return "there's stuff in the queue"
+        else:
+            return "Queue is empty"
 
     def add(self, job):
         """ Adds a new job to the queue """
@@ -32,5 +38,4 @@ class JobScheduler:
         while True:
             while not self._job_queue.empty():
                 current_job = self._job_queue.get()
-                result = current_job.run()
-                print result
+                print(current_job.run())

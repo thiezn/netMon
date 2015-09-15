@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from jobs import Job
-
+from datetime import datetime
 
 class IcmpProbe(Job):
     """ ICMP probe (a.k.a ping) """
@@ -12,19 +12,19 @@ class IcmpProbe(Job):
         self._min = 0
         self._max = 0
         self._avg = 0
+        self.start_time = datetime.now()
 
-    def __repr__(self):
+    def __str__(self):
         """ print out the job type when printing the object """
         return "ICMP to %s" % self.dest
 
     def run(self):
         """ Starts the ICMP poll
         returns the last known min/max/avg response in ms """
-        current_time = '13:50'
         for _ in range(self.count-1):
             self._avg += 1
 
-        return {'current_time': current_time,
-                'min': self._min,
-                'max': self._max,
-                'avg': self._avg}
+        end_time = datetime.now()
+        return (self.start_time,
+                {'min': self._min, 'max': self._max, 'avg': self._avg},
+                end_time)

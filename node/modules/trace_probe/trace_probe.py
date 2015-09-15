@@ -4,6 +4,8 @@ import socket
 import sys
 import subprocess
 import re
+from jobs import Job
+from datetime import datetime
 
 
 def extract_ip_from_line(line):
@@ -75,7 +77,7 @@ def traceroute(dest_ip, wait_time=1, max_hops=20, icmp=False):
     return trace_output
 
 
-class TraceProbe:
+class TraceProbe(Job):
     """ Trace probe (a.k.a traceroute) """
 
     def __init__(self, dest='127.0.0.1',
@@ -87,6 +89,7 @@ class TraceProbe:
         self.maxhops = maxhops
         self.timeout = timeout
         self.src_port = src_port
+        self.start_time = datetime.now()
 
     def __repr__(self):
         """ print out the job type when printing the object """
@@ -107,7 +110,7 @@ class TraceProbe:
             send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, udp)
             send_socket.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
             recv_socket.bind(("", self.src_port))
-            send_socket.sendto("", (self.dest, self.src_port))
+            send_socket.sendto(b"", (self.dest, self.src_port))
 
             curr_addr = None
             try:
@@ -125,9 +128,9 @@ class TraceProbe:
             if curr_addr == self.dest or ttl > self.maxhops:
                 break
 
-        return result
+        return (self.start_time, result, datetime.now())
 
 if __name__ == '__main__':
     trace_result = traceroute('8.8.8.8')
     for hop in trace_result:
-        print hop
+        print(hop)
