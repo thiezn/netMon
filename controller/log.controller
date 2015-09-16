@@ -1,0 +1,10 @@
+2015-09-16 20:09:52,340 INFO Initialising the Controller service
+2015-09-16 20:09:52,341 DEBUG Using selector: EpollSelector
+2015-09-16 20:09:52,348 INFO Serving on ('127.0.0.1', 10666)
+2015-09-16 20:09:54,511 INFO connection from ('127.0.0.1', 50196) 
+2015-09-16 20:09:54,522 INFO Client ('127.0.0.1', 50196) wants to register
+2015-09-16 20:09:54,522 INFO Client sent the following: {'shared_key': 'public', 'ip_addr': ['127.0.0.1'], 'last_registered': None, 'type': 'register', 'mac': 'aa:bb:cc:dd:ee:ff', 'last_node_id': None}
+2015-09-16 20:09:54,522 DEBUG Connected nodes are now [('127.0.0.1', 50196)]
+2015-09-16 20:09:55,534 INFO Node ('127.0.0.1', 50196) sent probe result: {'probe_type': 'icmp', 'result': 1, 'type': 'probe'}
+2015-09-16 20:09:56,541 INFO Node ('127.0.0.1', 50196) sent probe result: {'probe_type': 'icmp', 'result': 1, 'type': 'probe'}
+2015-09-16 20:09:57,547 INFO Node ('127.0.0.1', 50196) sent probe result: {'probe_type': 'icmp', 'result': 1, 'type': 'probe'}
