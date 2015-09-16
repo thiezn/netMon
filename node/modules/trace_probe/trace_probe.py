@@ -128,7 +128,7 @@ class TraceProbe(Job):
             if curr_addr == self.dest or ttl > self.maxhops:
                 break
 
-        return (self.start_time, result, datetime.now())
+        return result
 
 if __name__ == '__main__':
     trace_result = traceroute('8.8.8.8')

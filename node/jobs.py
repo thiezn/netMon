@@ -15,13 +15,14 @@ class Job:
 
 class JobScheduler:
 
-    def __init__(self):
+    def __init__(self, node_controller):
         # Create a job queue and start the scheduler in a seperate thread
         self._job_queue = queue.Queue()
         self._scheduler_thread = Thread(target=self._job_scheduler,
                                         args=(self._job_queue, ))
         self._scheduler_thread.daemon = True
         self._scheduler_thread.start()
+        self.node_controller = node_controller
 
     def __repr__(self):
         """ Print the current queue contents """
@@ -38,4 +39,6 @@ class JobScheduler:
         while True:
             while not self._job_queue.empty():
                 current_job = self._job_queue.get()
-                print(current_job.run())
+                self.node_controller.probe_result({'type': 'probe',
+                                                   'probe_type': 'icmp',
+                                                   'result': [current_job.run()]})

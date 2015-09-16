@@ -3,6 +3,7 @@
 from jobs import Job
 from datetime import datetime
 
+
 class IcmpProbe(Job):
     """ ICMP probe (a.k.a ping) """
 
@@ -20,11 +21,11 @@ class IcmpProbe(Job):
 
     def run(self):
         """ Starts the ICMP poll
-        returns the last known min/max/avg response in ms """
+        returns the last known min/max/avg response in ms
+
+        TODO: Have to pass on the start and end time of the probe
+        """
         for _ in range(self.count-1):
             self._avg += 1
 
-        end_time = datetime.now()
-        return (self.start_time,
-                {'min': self._min, 'max': self._max, 'avg': self._avg},
-                end_time)
+        return ({'min': self._min, 'max': self._max, 'avg': self._avg})

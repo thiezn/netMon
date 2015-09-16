@@ -11,10 +11,9 @@ class Node:
 
     def __init__(self):
         """ Loading available modules and setting up logging """
-        self.scheduler = JobScheduler()
         self.node_controller = NodeControllerClient('127.0.0.1', 10666)
-
         self.node_controller.register()
+        self.scheduler = JobScheduler(self.node_controller)
 
     def run(self):
         """ Start the main program loop """
@@ -28,7 +27,6 @@ class Node:
                 time.sleep(1)
                 print("Adding traceprobe job to queue")
                 self.scheduler.add(TraceProbe("213.46.237.24"))
-                self.node_controller.probe_result({'type': 'probe', 'probe_type': 'icmp', 'result': 1})
 
         except KeyboardInterrupt:
             print("\nTHanks for joining!")
