@@ -29,6 +29,7 @@ class NodeControllerClient:
         print("Registering to controller {}:{}".format(self.controller_addr,
                                                        self.controller_port))
         message = {'type': 'register',
+                   'version': '0.1',
                    'ip_addr': ['127.0.0.1'],
                    'mac': 'aa:bb:cc:dd:ee:ff',
                    'last_registered': None,

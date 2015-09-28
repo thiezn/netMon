@@ -1,0 +1,9 @@
+2015-09-17 10:06:51,377 INFO Initialising the Controller service
+2015-09-17 10:06:51,377 DEBUG Using selector: EpollSelector
+2015-09-17 10:06:51,390 INFO Serving on ('127.0.0.1', 10666)
+2015-09-17 10:07:01,182 INFO connection from ('127.0.0.1', 50562) 
+2015-09-17 10:07:01,183 INFO Client ('127.0.0.1', 50562) wants to register
+2015-09-17 10:07:01,183 INFO Client sent the following: {'mac': 'aa:bb:cc:dd:ee:ff', 'last_node_id': None, 'last_registered': None, 'shared_key': 'public', 'version': '0.1', 'ip_addr': ['127.0.0.1'], 'type': 'register'}
+2015-09-17 10:07:01,183 DEBUG Connected nodes are now [('127.0.0.1', 50562)]
+2015-09-17 10:07:02,237 INFO Node ('127.0.0.1', 50562) sent probe result: {'probe_type': 'icmp', 'result': [{'ip': '37.97.128.220', 'hop': 1}, {'ip': '87.253.141.250', 'hop': 2}, {'ip': '82.150.159.225', 'hop': 3}, {'ip': '217.170.0.242', 'hop': 4}, {'ip': '82.150.153.114', 'hop': 5}, {'ip': '84.116.132.217', 'hop': 6}, {'ip': '84.116.244.105', 'hop': 7}, {'ip': '213.46.237.24', 'hop': 8}], 'type': 'probe'}
+2015-09-17 10:07:03,237 INFO Node ('127.0.0.1', 50562) sent probe result: {'probe_type': 'icmp', 'result': [{'ip': '37.97.128.220', 'hop': 1}, {'ip': '87.253.141.250', 'hop': 2}, {'ip': '82.150.159.225', 'hop': 3}, {'ip': '217.170.0.242', 'hop': 4}, {'ip': '82.150.153.114', 'hop': 5}, {'ip': '84.116.134.90', 'hop': 6}, {'ip': '84.116.244.105', 'hop': 7}, {'ip': '213.46.237.24', 'hop': 8}], 'type': 'probe'}

@@ -41,4 +41,4 @@ class JobScheduler:
                 current_job = self._job_queue.get()
                 self.node_controller.probe_result({'type': 'probe',
                                                    'probe_type': 'icmp',
-                                                   'result': [current_job.run()]})
+                                                   'result': current_job.run()})

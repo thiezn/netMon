@@ -89,8 +89,15 @@ class Controller:
         """
         self.name = name
         self.nodes = []
+        self.version = '0.1'
 
     def register(self, node, msg):
+
+        if self.version != msg['version']:
+            logging.debug("Registration of node {} denied due to "
+                          "version mismatch".format(node))
+            return {'type': 'register', 'error': 'VERSION_MISMATCH'}
+
         self.nodes.append(node)
         logging.info('Client {} wants to register'.format(node))
         logging.info('Client sent the following: {}'.format(msg))
