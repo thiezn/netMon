@@ -1,37 +1,50 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-# Task Manager
-#
-# Responsible for handling tasks within the application
-# Built upon a asyncio event loop able to run tasks
-# asyncronously
-#
-# Various system components interface with this
-# module to run tasks and retrieve task results from
-# other components
-
-# Check Example 1 from PEP-0492, perhaps a class like that can
-# be used to put tasks on a queue and iterate through them
-# https://www.python.org/dev/peps/pep-0492/#id58
-
-# Since we would like to be able to start stop and cancel
-# tasks have a look at the loop.call_soon, call_later, call_at
-# functions
-
-import asyncio
+from threading import Thread
+import queue
 
 
-async def run_task(task_id):
-    """ Coroutine running a tasks in the asyncio loop """
-    await asyncio.sleep(1)
-    print("Task {} completed".format(task_id))
+class Task:
+    """ Class describing a Task for use in the TaskManager """
+    def run(self):
+        """ Runs the specified task
+        each task type has to overload this function """
+        raise NotImplementedError
 
-async def task_manager():
-    await asyncio.wait([run_task(1), run_task(2)])
 
-if __name__ == '__main__':
-    """ the main loop starts here """
+class TaskManager:
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(task_manager())
-    loop.close()
+    def __init__(self, controller):
+        # Create a task queue and start the manager in a seperate thread
+        self._task_queue = queue.Queue()
+        self._manager_thread = Thread(target=self._task_manager,
+                                      args=(self._task_queue, ))
+        self._manager_thread.daemon = True
+        self._manager_thread.start()
+        self.controller = controller
+
+    def __repr__(self):
+        """ Print the current queue contents """
+        if not self._task_queue.empty():
+            return "There's stuff in the task queue"
+        else:
+            return "The task queue is empty"
+
+    def add(self, task):
+        """ Adds a new task to the queue """
+        self._task_queue.put(task)
+
+    def run_now(self, task):
+        """ Adds a new tasks to the front of the queue """
+
+        print("run_now function not prioritised yet, "
+              "have to implement dequeue?")
+        self._task_queue.put(task)
+
+    def _task_manager(self, task_queue):
+        while True:
+            while not self._task_queue.empty():
+                current_task = self._task_queue.get()
+
+                if current_task.name == 'register':
+                    current_task.run()

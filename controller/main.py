@@ -1,40 +1,34 @@
 #!/usr/bin/env python3
 
-import asyncio
 import logging
-from node_connector import MessageHandler, ConnectionProtocol
+from task_manager import TaskManager
+from tcp_client import MessageHandler
+from tasks import RegisterNode
 
 
 def main():
-    logging.basicConfig(filename='log.message_handler',
+    logging.basicConfig(filename='log.main',
                         level=logging.DEBUG,
                         filemode='w',
                         format='%(asctime)s %(levelname)s %(message)s')
 
-    logging.info('Initialising the Message Handler service')
-    message_handler = MessageHandler()
-    loop = asyncio.get_event_loop()
-    # Each client will create a new protocol instance
-    coro = loop.create_server(lambda: ConnectionProtocol(message_handler,
-                                                         loop),
-                              '127.0.0.1', 10666)
-    server = loop.run_until_complete(coro)
+    logging.info('Launching the node controller tcp server...(NOT REALLY)')
 
-    # Serve requests until Ctrl+C
-    logging.info('Serving on {}'.format(server.sockets[0].getsockname()))
-    print('Serving on {}'.format(server.sockets[0].getsockname()))
+    logging.info('Setting up TCP connection to node controller server')
+    message_handler = MessageHandler('127.0.0.1', 10666)
+    logging.info('Registering to node controller server')
+    message_handler.register()
+
+    logging.info('Loading task_manager...')
+    task_manager = TaskManager(message_handler)
+
     try:
-        loop.run_forever()
+        while True:
+            if not message_handler.is_connected:
+                # (re)establish connection to node controller
+                task_manager.run_now(RegisterNode())
     except KeyboardInterrupt:
-        pass
-
-    # Close the server
-    try:
-        server.close()
-        loop.until_complete(server.wait_closed())
-        loop.close()
-    except:
-        pass
+        print("\nThanks for Joining!\n")
 
 if __name__ == '__main__':
     main()
