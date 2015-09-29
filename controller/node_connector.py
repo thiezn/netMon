@@ -5,8 +5,8 @@ import json
 import logging
 
 
-class ControllerProtocol(asyncio.Protocol):
-    """ A controller protocol listening for messages from nodes """
+class ConnectionProtocol(asyncio.Protocol):
+    """ A Connection protocol listening for messages from nodes """
 
     def __init__(self, connector, node):
         """ Connector mediates between the node and the Protocol.
@@ -72,14 +72,14 @@ class ControllerProtocol(asyncio.Protocol):
         return message.encode('utf-8')
 
 
-class Controller:
-    def __init__(self, name="MyController"):
-        """ Controller of remote nodes
+class MessageHandler:
+    def __init__(self, name="MyMessageHandler"):
+        """ MessageHandler of remote nodes
 
-        Nodes register to a controller and send their
+        Nodes register to a MessageHandler and send their
         probe results for processing.
 
-        The controller requires an underlying transport/protocol
+        The MessageHandler requires an underlying transport/protocol
         implementation to provide the low level send and
         receive of messages.
 
@@ -108,33 +108,4 @@ class Controller:
 
 
 if __name__ == '__main__':
-
-        logging.basicConfig(filename='log.controller',
-                            level=logging.DEBUG,
-                            filemode='w',
-                            format='%(asctime)s %(levelname)s %(message)s')
-
-        logging.info('Initialising the Controller service')
-        controller = Controller()
-        loop = asyncio.get_event_loop()
-        # Each client will create a new protocol instance
-        coro = loop.create_server(lambda: ControllerProtocol(controller,
-                                                             loop),
-                                  '127.0.0.1', 10666)
-        server = loop.run_until_complete(coro)
-
-        # Serve requests until Ctrl+C
-        logging.info('Serving on {}'.format(server.sockets[0].getsockname()))
-        print('Serving on {}'.format(server.sockets[0].getsockname()))
-        try:
-            loop.run_forever()
-        except KeyboardInterrupt:
-            pass
-
-        # Close the server
-        try:
-            server.close()
-            loop.until_complete(server.wait_closed())
-            loop.close()
-        except:
-            pass
+    pass
