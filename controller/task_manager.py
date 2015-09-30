@@ -51,12 +51,11 @@ class TaskManager:
         self._task_queue.put(task)
 
     def _task_manager(self, task_queue, message_handler):
+
+        if not self.message_handler.is_connected:
+            # Register to the controller
+            self.add(RegisterNode())
         while True:
-
-            if not self.message_handler.is_connected:
-                # (re)register to the controller
-                self.add(RegisterNode())
-
             while not self._task_queue.empty():
                 current_task = self._task_queue.get()
 
@@ -65,6 +64,7 @@ class TaskManager:
                     print("registering")
                     current_task.run(self.message_handler)
 
-                if(current_task.name == 'unregister' and
-                   self.message_handler.is_connected):
+                elif(current_task.name == 'unregister' and
+                     self.message_handler.is_connected):
                     current_task.run(self.message_handler)
+                    break
