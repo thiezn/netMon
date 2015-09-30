@@ -2,13 +2,11 @@
 
 import logging
 from task_manager import TaskManager
-from tcp_client import MessageHandler
-from tasks import RegisterNode
 from config_manager import Configuration
 
 
 def main():
-    config = Configuration()
+    #    config = Configuration()
     logging.basicConfig(filename='log.main',
                         level=logging.DEBUG,
                         filemode='w',
@@ -16,20 +14,16 @@ def main():
 
     logging.info('Launching the node controller tcp server...(NOT REALLY)')
 
-    logging.info('Setting up TCP connection to node controller server')
-    message_handler = MessageHandler(config.tcp_server['address'],
-                                     config.tcp_server['port'])
-    logging.info('Registering to node controller server')
-    message_handler.register()
-
     logging.info('Loading task_manager...')
-    task_manager = TaskManager(message_handler)
+    task_manager = TaskManager()
+
+    task_manager.run()
 
     try:
         while True:
-            if not message_handler.is_connected:
-                # (re)establish connection to node controller
-                task_manager.run_now(RegisterNode())
+            # Here we can send probes to the task_manager
+            # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
+            pass
     except KeyboardInterrupt:
         print("\nThanks for Joining!\n")
 

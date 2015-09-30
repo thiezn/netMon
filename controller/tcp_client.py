@@ -15,7 +15,7 @@ class MessageHandler:
     def __init__(self, controller_address, controller_port):
         self.controller_addr = controller_address
         self.controller_port = controller_port
-        self.is_connected = True
+        self.is_connected = False
 
     def register(self):
         """ Registers to the controller """
@@ -24,6 +24,7 @@ class MessageHandler:
                                            self.controller_port)
         print("Registering to controller {}:{}".format(self.controller_addr,
                                                        self.controller_port))
+        self.is_connected = True
         message = {'type': 'register',
                    'version': '0.1',
                    'ip_addr': ['127.0.0.1'],
