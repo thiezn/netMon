@@ -4,9 +4,11 @@ import logging
 from task_manager import TaskManager
 from tcp_client import MessageHandler
 from tasks import RegisterNode
+from config_manager import Configuration
 
 
 def main():
+    config = Configuration()
     logging.basicConfig(filename='log.main',
                         level=logging.DEBUG,
                         filemode='w',
@@ -15,7 +17,8 @@ def main():
     logging.info('Launching the node controller tcp server...(NOT REALLY)')
 
     logging.info('Setting up TCP connection to node controller server')
-    message_handler = MessageHandler('127.0.0.1', 10666)
+    message_handler = MessageHandler(config.tcp_server['address'],
+                                     config.tcp_server['port'])
     logging.info('Registering to node controller server')
     message_handler.register()
 
