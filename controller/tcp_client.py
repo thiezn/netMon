@@ -36,6 +36,14 @@ class MessageHandler:
         reply = self.protocol.recv_message()
         return reply
 
+    def unregister(self):
+        """ Unregisters from the controller """
+        print("Unregistering from controller {}:{}".format(self.controller_addr,
+                                                           self.controller_port))
+        self.is_connected = False
+        message ={'type': 'unregister'}
+        self.protocol.send_message(message)
+
     def heartbeat(self):
         """ Sends a heartbeat message to the controller
 

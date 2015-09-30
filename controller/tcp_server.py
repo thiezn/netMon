@@ -34,6 +34,8 @@ class ConnectionProtocol(asyncio.Protocol):
         """
         if msg['type'] == 'register':
             self._connector.register(self.peername, msg)
+        if msg['type'] == 'unregister':
+            self._connector.unregister(self.peername, msg)
         if msg['type'] == 'probe':
             self._connector.probe_result(self.peername, msg)
 
@@ -92,6 +94,9 @@ class MessageHandler:
         self.version = '0.1'
 
     def register(self, node, msg):
+        """ Registers a node to the controller
+
+        Only accepting connection if software versions match """
 
         if self.version != msg['version']:
             logging.debug("Registration of node {} denied due to "
@@ -101,6 +106,13 @@ class MessageHandler:
         self.nodes.append(node)
         logging.info('Client {} wants to register'.format(node))
         logging.info('Client sent the following: {}'.format(msg))
+        logging.debug('Connected nodes are now {}'.format(self.nodes))
+
+    def unregister(self, node, msg):
+        """ Unregisters a node from the controller """
+
+        self.nodes.remove(node)
+        logging.info('client {} wants to unregister'.format(node))
         logging.debug('Connected nodes are now {}'.format(self.nodes))
 
     def probe_result(self, node, msg):

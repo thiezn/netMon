@@ -15,10 +15,19 @@ class Task:
 
 
 class RegisterNode(Task):
-    """ Registers a node to the node controller message_handler """
+    """ Registers a node to the message_handler """
 
     def __init__(self):
         self.name = "register"
 
     def run(self, message_handler):
         message_handler.register()
+
+class UnregisterNode(Task):
+    """ Unregisters a node from the message_handler """
+
+    def __init__(self):
+        self.name = "unregister"
+
+    def run(self, message_handler):
+        message_handler.unregister()

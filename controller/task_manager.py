@@ -3,7 +3,7 @@
 from threading import Thread
 from tcp_client import MessageHandler
 import queue
-from tasks import RegisterNode
+from tasks import RegisterNode, UnregisterNode
 
 
 class TaskManager:
@@ -21,7 +21,7 @@ class TaskManager:
         else:
             return "The task queue is empty"
 
-    def run(self):
+    def start(self):
         """ Start the task manager
 
         Here we will start the messsage_handler and
@@ -32,6 +32,14 @@ class TaskManager:
                                             self.message_handler))
         self._manager_thread.daemon = True
         self._manager_thread.start()
+
+    def stop(self):
+        """ Gracefully stops the task manager """
+
+        # unregister us from the message_handler
+        self.add(UnregisterNode())
+        # wait for all the pending tasks to finish
+        # self._manager_thread.join()
 
     def get(self):
         """ returns a task from the task_result queue
@@ -55,4 +63,8 @@ class TaskManager:
                 if(current_task.name == 'register' and
                    not self.message_handler.is_connected):
                     print("registering")
+                    current_task.run(self.message_handler)
+
+                if(current_task.name == 'unregister' and
+                   self.message_handler.is_connected):
                     current_task.run(self.message_handler)

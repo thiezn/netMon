@@ -17,7 +17,7 @@ def main():
     logging.info('Loading task_manager...')
     task_manager = TaskManager()
 
-    task_manager.run()
+    task_manager.start()
 
     try:
         while True:
@@ -25,6 +25,7 @@ def main():
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
             pass
     except KeyboardInterrupt:
+        task_manager.stop()
         print("\nThanks for Joining!\n")
 
 if __name__ == '__main__':
