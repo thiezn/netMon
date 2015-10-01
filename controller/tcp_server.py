@@ -120,7 +120,7 @@ class MessageHandler:
 
 
 def main():
-    logging.basicConfig(filename='log.message_handler',
+    logging.basicConfig(filename='log.tcp_server',
                         level=logging.DEBUG,
                         filemode='w',
                         format='%(asctime)s %(levelname)s %(message)s')
