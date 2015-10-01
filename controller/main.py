@@ -4,6 +4,7 @@ import logging
 from task_manager import TaskManager
 from config_manager import Configuration
 from time import sleep
+from probes.icmp_probe import IcmpProbe
 
 
 def main():
@@ -24,7 +25,8 @@ def main():
         while True:
             # Here we can send probes to the task_manager
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
-            pass
+            task_manager.add(IcmpProbe('127.0.0.1'))
+            sleep(2)
     except KeyboardInterrupt:
         task_manager.stop()
         print("\nThanks for Joining!\n")

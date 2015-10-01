@@ -66,11 +66,12 @@ class TaskManager:
 
                     if(current_task.name == 'RegisterNode' and
                        not self.message_handler.is_connected):
-                        print("registering")
                         current_task.run(self.message_handler)
 
                     elif(current_task.name == 'UnregisterNode' and
                          self.message_handler.is_connected):
                         current_task.run(self.message_handler)
+                    else:
+                        current_task.run()
                 else:
                     self._task_queue.put(current_task)
