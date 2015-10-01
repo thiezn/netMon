@@ -4,6 +4,7 @@ from threading import Thread
 from tcp_client import MessageHandler
 import queue
 from tasks import RegisterNode, UnregisterNode
+import time
 
 
 class TaskManager:
@@ -59,12 +60,17 @@ class TaskManager:
             while not self._task_queue.empty():
                 current_task = self._task_queue.get()
 
-                if(current_task.name == 'RegisterNode' and
-                   not self.message_handler.is_connected):
-                    print("registering")
-                    current_task.run(self.message_handler)
+                # Check if the task should be run already
+                # If not, add it to the back of the queue
+                if current_task.run_at <= time.time():
 
-                elif(current_task.name == 'UnregisterNode' and
-                     self.message_handler.is_connected):
-                    current_task.run(self.message_handler)
-                    break
+                    if(current_task.name == 'RegisterNode' and
+                       not self.message_handler.is_connected):
+                        print("registering")
+                        current_task.run(self.message_handler)
+
+                    elif(current_task.name == 'UnregisterNode' and
+                         self.message_handler.is_connected):
+                        current_task.run(self.message_handler)
+                else:
+                    self._task_queue.put(current_task)
