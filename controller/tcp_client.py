@@ -17,6 +17,13 @@ class MessageHandler:
         self.controller_port = controller_port
         self.is_connected = False
 
+    def handle_recv_queue(self):
+        """ This handles any potential messages in the
+        message queue """
+
+        if not self.protocol.msg_queue.empty():
+            print('got message {}'.format(self.protocol.msg_queue.get()))
+
     def register(self):
         """ Registers to the controller """
 
@@ -33,15 +40,14 @@ class MessageHandler:
                    'last_node_id': None,
                    'shared_key': 'public'}
         self.protocol.send_message(message)
-        reply = self.protocol.recv_message()
-        return reply
 
     def unregister(self):
         """ Unregisters from the controller """
-        print("Unregistering from controller {}:{}".format(self.controller_addr,
-                                                           self.controller_port))
+
+        print("Unregistering from controller {}:{}"
+              .format(self.controller_addr, self.controller_port))
         self.is_connected = False
-        message ={'type': 'unregister'}
+        message = {'type': 'unregister'}
         self.protocol.send_message(message)
 
     def heartbeat(self):
@@ -52,8 +58,8 @@ class MessageHandler:
         """
         self.protocol.send_message({'type': 'PING'})
 
-    def probe_result(self, result):
-        self.protocol.send_message(result)
+    def probe(self, message):
+        self.protocol.send_message(message)
 
 
 class ConnectionProtocol:
@@ -68,6 +74,7 @@ class ConnectionProtocol:
     def __init__(self, hub_address, hub_port):
         """ Set up the TCP connection to the controller node """
         self.recv_queue = queue.Queue()
+        self.msg_queue = queue.Queue()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((hub_address, hub_port))
         self.sock.setblocking(0)
@@ -94,11 +101,6 @@ class ConnectionProtocol:
             self.recv_queue.put(json.loads(buff.strip()))
         except BlockingIOError:
             pass
-
-        if not self.recv_queue.empty():
-            return self.recv_queue.get_nowait()
-        else:
-            return None
 
     def close(self):
         """ Closes the socket connection """

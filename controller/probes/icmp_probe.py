@@ -16,5 +16,6 @@ class IcmpProbe(Task):
                          recurrence_count=recurrence_count)
         self.dest_addr = dest_addr
 
-    def run(self):
-        print("Running ping to {}".format(self.dest_addr))
+    def run(self, message_handler):
+        print("Sending icmp probe to controller")
+        message_handler.probe({'type': 'probe', 'data': self.dest_addr})

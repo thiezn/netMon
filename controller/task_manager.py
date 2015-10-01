@@ -57,7 +57,9 @@ class TaskManager:
             # Register to the controller
             self.add(RegisterNode())
         while True:
-            while not self._task_queue.empty():
+
+            # First lets handle all the queued tasks
+            if not self._task_queue.empty():
                 current_task = self._task_queue.get()
 
                 # Check if the task should be run already
@@ -71,9 +73,20 @@ class TaskManager:
                     elif(current_task.name == 'UnregisterNode' and
                          self.message_handler.is_connected):
                         current_task.run(self.message_handler)
+                    elif 'Probe' in current_task.name:
+                        current_task.run(self.message_handler)
                     else:
                         current_task.run()
-                        if current_task.reschedule():
-                            self._task_queue.put(current_task)
+
+                    if current_task.reschedule():
+                        self._task_queue.put(current_task)
                 else:
                     self._task_queue.put(current_task)
+
+            # Now lets see if there are any messages received
+            # from the controller.
+            # TODO: I guess a lot of this logic should go into the message_handler
+            # class instead of accessing the protocol directly
+            self.message_handler.protocol.recv_message()
+            if not self.message_handler.protocol.recv_queue.empty():
+                print(self.message_handler.protocol.recv_queue.get())

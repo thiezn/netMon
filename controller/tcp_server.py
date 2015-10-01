@@ -37,7 +37,9 @@ class ConnectionProtocol(asyncio.Protocol):
         if msg['type'] == 'unregister':
             self._connector.unregister(self.peername, msg)
         if msg['type'] == 'probe':
-            self._connector.probe_result(self.peername, msg)
+            result = self._connector.probe(self.peername, msg)
+            if result:
+                self.send_msg(result)
 
     def connection_made(self, transport):
         """ Called when connection is initiated to this node """
@@ -71,7 +73,7 @@ class ConnectionProtocol(asyncio.Protocol):
         message is terminated by line feed (\r\n) """
 
         message = json.dumps(data, separators=(',', ':')) + "\r\n"
-        return message.encode('utf-8')
+        self.transport.write(message.encode('utf-8'))
 
 
 class MessageHandler:
@@ -115,8 +117,9 @@ class MessageHandler:
         logging.info('client {} wants to unregister'.format(node))
         logging.debug('Connected nodes are now {}'.format(self.nodes))
 
-    def probe_result(self, node, msg):
+    def probe(self, node, msg):
         logging.info('Node {} sent probe result: {}'.format(node, msg))
+        return {'type': 'probe', 'data': 'received probe, thanks!'}
 
 
 def main():
