@@ -20,18 +20,18 @@ A local node is able to look at the environment from its own perspective. Tradit
 
 ##Probing Capabilities
 The node network interfaces can be configured as a trunk. This will allow you to hook into the distribution layer of a site and be able to run probes from various vlans.
-|Probe      |Description                       |
-|-----------|----------------------------------|
-|ICMP       |                                  |
-|http(s)    |                                  |
-|Traceroute |                                  |
-|MTR        |(traceroute/ping probe)           |
-|TCP        |                                  |
-|UDP        |                                  |
-|SNMP       |                                  |    
-|MTU        |                                  |
-|Bandwidth  |                                  |
-|TCP Dump   |Not technically a probe but well..|
+Probe      |Description                       
+-----------
+ICMP       |
+http(s)    |
+Traceroute |
+MTR        |(traceroute/ping probe)
+TCP        |
+UDP        |
+SNMP       |
+MTU        |
+Bandwidth  |
+TCP Dump   |Not technically a probe but well..
 
 ##Main features
 - Full mesh node network providing
