@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+import time
 
 
 class Task:
@@ -32,7 +32,7 @@ class Task:
                              'providing recurrence_count')
 
         if run_at == "now":
-            self.run_at = datetime.now()
+            self.run_at = time.time()
         else:
             self.run_at = run_at
 
@@ -45,22 +45,12 @@ class Task:
 class RegisterNode(Task):
     """ Registers a node to the message_handler """
 
-    """
-    def __init__(self):
-        self.name = "register"
-    """
-
     def run(self, message_handler):
         message_handler.register()
 
 
 class UnregisterNode(Task):
     """ Unregisters a node from the message_handler """
-
-    """
-    def __init__(self):
-        self.name = "unregister"
-    """
 
     def run(self, message_handler):
         message_handler.unregister()
