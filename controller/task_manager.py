@@ -73,5 +73,7 @@ class TaskManager:
                         current_task.run(self.message_handler)
                     else:
                         current_task.run()
+                        if current_task.reschedule():
+                            self._task_queue.put(current_task)
                 else:
                     self._task_queue.put(current_task)

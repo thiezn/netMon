@@ -2,7 +2,7 @@
 
 import logging
 from task_manager import TaskManager
-from config_manager import Configuration
+# from config_manager import Configuration
 import time
 from probes.icmp_probe import IcmpProbe
 
@@ -22,15 +22,17 @@ def main():
     task_manager.start()
 
     try:
+        task_manager.add(IcmpProbe('one time scheduled ping after 10sec',
+                                   run_at=time.time()+10))
+        task_manager.add(IcmpProbe('10x recurring task each second',
+                                   recurrence_time=1, recurrence_count=10))
         while True:
             # Here we can send probes to the task_manager
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
-            task_manager.add(IcmpProbe('10.0.0.1'))
-            task_manager.add(IcmpProbe('127.0.0.1', run_at=time.time()+10))
-            time.sleep(2)
+            pass
     except KeyboardInterrupt:
         task_manager.stop()
-        print("\nThanks for Joining!\n")
+        print("\nThanks for joining!\n")
         time.sleep(1)    # Give it some time to deliver the unregister message
 
 if __name__ == '__main__':

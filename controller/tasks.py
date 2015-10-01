@@ -13,7 +13,7 @@ class Task:
     """
 
     def __init__(self, run_at="now",
-                 recurrence_time=None, recurrence_count=None):
+                 recurrence_time=None, recurrence_count=0):
         """ Define the task name, set the run at time and define
          recurrence if any
 
@@ -35,6 +35,21 @@ class Task:
             self.run_at = time.time()
         else:
             self.run_at = run_at
+
+    def reschedule(self):
+        """ Check if the Task has to reoccur again and if so
+        returns the task back to the task_manager.
+
+        This should be run by the task_manager class each time
+        it has run a Task that has the potential to be run again
+        """
+
+        if self.recurrence_time and self.recurrence_count > 1:
+            self.run_at += self.recurrence_time
+            self.recurrence_count -= 1
+            return True
+        else:
+            return False
 
     def run(self):
         """ Runs the specified task
