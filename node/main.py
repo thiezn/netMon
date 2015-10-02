@@ -6,6 +6,7 @@ from task_manager import TaskManager
 import time
 from probes.icmp_probe import IcmpProbe
 from probes.trace_probe import TraceProbe
+from probes.ping_probe import PingProbe
 
 
 def main():
@@ -27,6 +28,7 @@ def main():
                                    run_at=time.time()+10))
         task_manager.add(IcmpProbe('10x recurring task each second',
                                    recurrence_time=1, recurrence_count=10))
+        task_manager.add(PingProbe('149.210.184.36'))
         task_manager.add(TraceProbe('8.8.8.8'))
         while True:
             # Here we can send probes to the task_manager
