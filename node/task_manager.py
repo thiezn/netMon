@@ -39,8 +39,6 @@ class TaskManager:
 
         # unregister us from the message_handler
         self.add(UnregisterNode())
-        # wait for all the pending tasks to finish
-        # self._manager_thread.join()
 
     def get(self):
         """ returns a task from the task_result queue

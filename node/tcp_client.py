@@ -8,6 +8,7 @@ import queue
 import socket
 from time import sleep
 
+
 class MessageHandler:
     """ Handles send/recv messages from the ConnectionProtocol class.
     task_manager uses this to handle tasks """

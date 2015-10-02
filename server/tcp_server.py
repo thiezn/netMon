@@ -51,13 +51,11 @@ class ConnectionProtocol(asyncio.Protocol):
         logging.info('connection from {} '.format(self.peername))
 
     def connection_lost(self, exc):
-        if exc:
-            # Make sure we unregister a node when a connection
-            # is terminated due to an exception
-            logging.debug('Lost connection to node {} due to {}, '
-                          'calling message_handler.unregister'
-                          .format(self.peername, exc))
-            self._message_handler.unregister(self.peername, {'error': exc})
+        # Make sure we unregister a node when a connection
+        # is terminated due to an exception
+        if not exc:
+            exc = "Connection reset by peer"
+        self._message_handler.unregister(self.peername, exc)
 
     def data_received(self, data):
         """ The protocol expects a json message containing
@@ -125,16 +123,18 @@ class MessageHandler:
         logging.debug('Connected nodes are now {}'.format(self.nodes))
         self._update_console()
 
-    def unregister(self, node, msg):
+    def unregister(self, node, msg=None):
         """ Unregisters a node from the controller """
 
-        logging.info('client {} wants to unregister'.format(node))
         try:
             self.nodes.remove(node)
+            logging.info('Unregistering client {}, reason {}'
+                         .format(node, msg))
+            logging.info('Connected nodes: {}'.format(self.nodes))
         except ValueError:
-            logging.debug('Node {} not found in node list, '
-                          'already unregistered?'.format(node))
-        logging.info('Connected nodes: {}'.format(self.nodes))
+            # node not in list. probably already unregistered
+            pass
+
         self._update_console()
 
     def probe(self, node, msg):
