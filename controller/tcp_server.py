@@ -8,16 +8,16 @@ import logging
 class ConnectionProtocol(asyncio.Protocol):
     """ A Connection protocol listening for messages from nodes """
 
-    def __init__(self, connector, node):
+    def __init__(self, message_handler, node):
         """ Connector mediates between the node and the Protocol.
         Node is the local node on the network that handles incoming
         messages """
-        self._connector = connector
+        self._message_handler = message_handler
         self._node = node
         self._recv_buffer = ''
 
     def message_received(self, msg):
-        """ Process the raw data with the connector and local node
+        """ Process the raw data with the message_handler and local node
 
         TODO: What are we going to do with the Data? We should
         store the received probe data in a database probably. Do
@@ -29,16 +29,16 @@ class ConnectionProtocol(asyncio.Protocol):
         Have to describe a header, or at least a json/dict standard for
         messages.
 
-        The actual code for handling messages reside in the connector class,
+        The actual code for handling messages reside in the message_handler class,
         in this case the Controller. This function should determine the
-        right message type and call the connector function to handle the data
+        right message type and call the message_handler function to handle the data
         """
         if msg['type'] == 'register':
-            self._connector.register(self.peername, msg)
+            self._message_handler.register(self.peername, msg)
         if msg['type'] == 'unregister':
-            self._connector.unregister(self.peername, msg)
+            self._message_handler.unregister(self.peername, msg)
         if msg['type'] == 'probe':
-            result = self._connector.probe(self.peername, msg)
+            result = self._message_handler.probe(self.peername, msg)
             if result:
                 self.send_msg(result)
 
