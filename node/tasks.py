@@ -44,7 +44,10 @@ class Task:
         it has run a Task that has the potential to be run again
         """
 
-        if self.recurrence_time and self.recurrence_count > 1:
+        if self.recurrence_time and not self.recurrence_count:
+            # persistent reoccuring task
+            return True
+        elif self.recurrence_time and self.recurrence_count > 1:
             self.run_at += self.recurrence_time
             self.recurrence_count -= 1
             return True
