@@ -29,9 +29,10 @@ class ConnectionProtocol(asyncio.Protocol):
         Have to describe a header, or at least a json/dict standard for
         messages.
 
-        The actual code for handling messages reside in the message_handler class,
-        in this case the Controller. This function should determine the
-        right message type and call the message_handler function to handle the data
+        The actual code for handling messages reside in the message_handler
+        class, in this case the Controller. This function should determine the
+        right message type and call the message_handler function to handle the
+        data
         """
         if msg['type'] == 'register':
             self._message_handler.register(self.peername, msg)
@@ -47,8 +48,16 @@ class ConnectionProtocol(asyncio.Protocol):
 
         self.transport = transport
         self.peername = self.transport.get_extra_info('peername')
-        print("connection from {}".format(self.peername))
         logging.info('connection from {} '.format(self.peername))
+
+    def connection_lost(self, exc):
+        if exc:
+            # Make sure we unregister a node when a connection
+            # is terminated due to an exception
+            logging.debug('Lost connection to node {} due to {}, '
+                          'calling message_handler.unregister'
+                          .format(self.peername, exc))
+            self._message_handler.unregister(self.peername, {'error': exc})
 
     def data_received(self, data):
         """ The protocol expects a json message containing
@@ -96,6 +105,10 @@ class MessageHandler:
         self.nodes = []
         self.version = '0.1'
 
+    def _update_console(self):
+        """ Call this function to update the terminal window output """
+        print("Connected nodes: {}         ".format(len(self.nodes)), end='\r')
+
     def register(self, node, msg):
         """ Registers a node to the controller
 
@@ -110,13 +123,19 @@ class MessageHandler:
         logging.info('Client {} wants to register'.format(node))
         logging.info('Client sent the following: {}'.format(msg))
         logging.debug('Connected nodes are now {}'.format(self.nodes))
+        self._update_console()
 
     def unregister(self, node, msg):
         """ Unregisters a node from the controller """
 
-        self.nodes.remove(node)
         logging.info('client {} wants to unregister'.format(node))
-        logging.debug('Connected nodes are now {}'.format(self.nodes))
+        try:
+            self.nodes.remove(node)
+        except ValueError:
+            logging.debug('Node {} not found in node list, '
+                          'already unregistered?'.format(node))
+        logging.info('Connected nodes: {}'.format(self.nodes))
+        self._update_console()
 
     def probe(self, node, msg):
         logging.info('Node {} sent probe result: {}'.format(node, msg))
