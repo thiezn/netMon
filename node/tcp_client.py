@@ -6,7 +6,7 @@
 import json
 import queue
 import socket
-
+from time import sleep
 
 class MessageHandler:
     """ Handles send/recv messages from the ConnectionProtocol class.
@@ -65,11 +65,19 @@ class ConnectionProtocol:
     or threading but rather leave it to the OS to handle
     """
 
-    def __init__(self, hub_address, hub_port):
+    def __init__(self, server_address, server_port):
         """ Set up the TCP connection to the controller node """
         self.recv_queue = queue.Queue()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((hub_address, hub_port))
+        while True:
+            try:
+                self.sock.connect((server_address, server_port))
+                break
+            except ConnectionRefusedError:
+                print("Could not connect to server {}:{}. Retrying in 2 sec"
+                      .format(server_address, server_port))
+                sleep(2)
+
         self.sock.setblocking(0)
 
     def send_message(self, message):

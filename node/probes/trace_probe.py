@@ -1,136 +1,103 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import socket
+# This probe runs the UNIX traceroute command and parses the output.
+#
+# Written by M. Mortimer
+#
+# v0.1 2-10-2015 - Initial version created based on trace script for infoblox
+
 import sys
-import subprocess
-import re
-from jobs import Job
-from datetime import datetime
+import subprocess       # For calling external shell commands
+import re               # used for regular expression matching
+from tasks import Task
 
 
-def extract_ip_from_line(line):
-    """ Check a string line to see if there's an valid IP address """
-    ip = re.compile('(([2][5][0-5]\.)|'
-                    '([2][0-4][0-9]\.)|'
-                    '([0-1]?[0-9]?[0-9]\.)){3}'
-                    '(([2][5][0-5])|([2][0-4][0-9])|'
-                    '([0-1]?[0-9]?[0-9]))')
-    match = ip.search(line)
+class TraceProbe(Task):
 
-    if match:
-        return match.group()
-    else:
-        return None
-
-
-def extract_rtt_from_line(line):
-    """ Fetch the first occurance of the round-trip time of
-    a traceroute output """
-
-    if line:
-        rtt = line.split(' ms')[0].split()[-1]
-        return rtt
-    else:
-        return None
-
-
-def traceroute(dest_ip, wait_time=1, max_hops=20, icmp=False):
-    """ This command runs a traceroute on the CLI and returns
-    the results """
-
-    if sys.platform == 'linux2':
-        if icmp:
-            # Use TCP traceroute to be able to traverse firewall
-            parameters = ["sudo", "traceroute", "-I", "-n",
-                          "-w", str(wait_time), "-m", str(max_hops),
-                          "-n", "-q 1", dest_ip]
-        else:
-            # normal udp based traceroute
-            parameters = ["traceroute", "-n", "-w", str(wait_time),
-                          "-m", str(max_hops), "-n", "-q 1", dest_ip]
-    else:
-        # assume we're on windows.. Yes I know, maybe
-        # someday we'll introduce MacOS support :)
-        parameters = ["C:\Windows\System32\\tracert.exe", "-d",
-                      "-w", wait_time, '-h', max_hops, dest_ip]
-
-    trace = subprocess.Popen(parameters,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    stdout, stderr = trace.communicate()
-
-    # Parse the traceroute result
-    hop = 1
-    trace_output = []
-    for line in stdout.splitlines():
-        ip_address = extract_ip_from_line(line)
-        rtt = extract_rtt_from_line(line)
-        if(ip_address and not line.startswith("traceroute to") and
-           not line.startswith("Tracing")):
-            trace_output.append({'hop': hop, 'ip_address': ip_address,
-                                 'rtt': rtt})
-            hop += 1
-        elif '*' in line:
-            trace_output.append({'hop': hop, 'ip_address': "*"})
-            hop += 1
-
-    return trace_output
-
-
-class TraceProbe(Job):
-    """ Trace probe (a.k.a traceroute) """
-
-    def __init__(self, dest='127.0.0.1',
-                 maxhops=10, timeout=1,
-                 src_port=33434):
-        """ Initialise the traceroute options """
-
-        self.dest = dest
-        self.maxhops = maxhops
-        self.timeout = timeout
-        self.src_port = src_port
-        self.start_time = datetime.now()
-
-    def __repr__(self):
-        """ print out the job type when printing the object """
-        return "Traceroute to %s" % self.dest
+    def __init__(self, dest_ip, wait_time='1', max_hops='20', icmp=False,
+                 run_at="now", recurrence_time=None, recurrence_count=None):
+        """ initialize  Task scheduling and traceroute options """
+        super().__init__(run_at=run_at,
+                         recurrence_time=recurrence_time,
+                         recurrence_count=recurrence_count)
+        self.dest_ip = dest_ip
+        self.wait_time = wait_time
+        self.max_hops = max_hops
+        self.icmp = icmp
 
     def run(self):
-        """ Starts the Trace
+        """ Runs the traceroute, gets called by the task_manager """
+        print(self.traceroute())
 
-        Returns a list of dictionary containing hop and latency """
+    def extract_rtt_from_line(self, line):
+        """ Fetch the first occurance of the round-trip time of
+        a traceroute output """
 
-        result = []
-        icmp = socket.getprotobyname('icmp')
-        udp = socket.getprotobyname('udp')
-        ttl = 1
+        if line:
+            rtt = line.split(' ms')[0].split()[-1]
+            return rtt
+        else:
+            return None
 
-        while True:
-            recv_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
-            send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, udp)
-            send_socket.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
-            recv_socket.bind(("", self.src_port))
-            send_socket.sendto(b"", (self.dest, self.src_port))
+    def extract_ip_from_line(self, line):
+        """ Check a string line to see if there's an valid IP address
 
-            curr_addr = None
-            try:
-                _, curr_addr = recv_socket.recvfrom(512)
-                curr_addr = curr_addr[0]
-            except socket.error:
-                pass
-            finally:
-                send_socket.close()
-                recv_socket.close()
+        TODO: Check if we can replace this with the ipaddress module from
+        python 3?
+        """
+        ip = re.compile('(([2][5][0-5]\.)|'
+                        '([2][0-4][0-9]\.)|'
+                        '([0-1]?[0-9]?[0-9]\.)){3}'
+                        '(([2][5][0-5])|([2][0-4][0-9])|'
+                        '([0-1]?[0-9]?[0-9]))')
+        match = ip.search(line)
 
-            result.append({'hop': ttl, 'ip': curr_addr})
+        if match:
+            return match.group()
+        else:
+            return None
 
-            ttl += 1
-            if curr_addr == self.dest or ttl > self.maxhops:
-                break
+    def traceroute(self):
+        """ This command runs a traceroute and returns
+        the results """
 
-        return result
+        if sys.platform.startswith('linux'):
+            if self.icmp:
+                # Use TCP traceroute to be able to traverse firewall
+                parameters = ["sudo", "traceroute", "-I", "-n",
+                              "-w " + self.wait_time, "-m " + self.max_hops,
+                              "-n", "-q 1", self.dest_ip]
+            else:
+                # normal udp based traceroute
+                parameters = ["traceroute", "-n", "-w " + self.wait_time,
+                              "-m " + self.max_hops, "-n", "-q 1",
+                              self.dest_ip]
+        else:
+            # assume we're on windows.. Yes I know, maybe
+            # someday we'll introduce MacOS support :)
+            parameters = ["C:\Windows\System32\\tracert.exe", "-d",
+                          "-w", self.wait_time, '-h', self.max_hops,
+                          self.dest_ip]
 
-if __name__ == '__main__':
-    trace_result = traceroute('8.8.8.8')
-    for hop in trace_result:
-        print(hop)
+        trace = subprocess.Popen(parameters,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+        stdout, stderr = trace.communicate()
+
+        # Parse the traceroute result
+        hop = 1
+        trace_output = []
+        for line in stdout.splitlines():
+            line = line.decode('utf-8')
+            ip_address = self.extract_ip_from_line(line)
+            rtt = self.extract_rtt_from_line(line)
+            if(ip_address and not line.startswith("traceroute to") and
+               not line.startswith("Tracing")):
+                trace_output.append({'hop': hop, 'ip_address': ip_address,
+                                     'rtt': rtt})
+                hop += 1
+            elif '*' in line:
+                trace_output.append({'hop': hop, 'ip_address': "*"})
+                hop += 1
+
+        return trace_output

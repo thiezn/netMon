@@ -73,7 +73,7 @@ class TaskManager:
                     elif(current_task.name == 'UnregisterNode' and
                          self.message_handler.is_connected):
                         current_task.run(self.message_handler)
-                    elif 'Probe' in current_task.name:
+                    elif 'IcmpProbe' in current_task.name:
                         current_task.run(self.message_handler)
                     else:
                         current_task.run()
