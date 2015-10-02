@@ -14,6 +14,7 @@ class ConnectionProtocol(asyncio.Protocol):
         messages """
         self._connector = connector
         self._node = node
+        self._recv_buffer = ''
 
     def message_received(self, msg):
         """ Process the raw data with the connector and local node
@@ -53,17 +54,17 @@ class ConnectionProtocol(asyncio.Protocol):
         """ The protocol expects a json message containing
         the following fields:
 
-            type:       subscribe/unsubscribe
-            channel:    the name of the channel
-
-        Upon receiving a valid message the protocol registers
-        the client with the pubsub hub. When succesfully registered
-        we return the following json message:
+            type:       register/unregister/probe/bla
+            args*:      Whatever data the type requires
         """
-        # TODO: have to create a message buffer, splitting messages with \r\n
-        # For now assume we only receive one liners
 
-        self.message_received(json.loads(data.decode("utf-8")))
+        self._recv_buffer += data.decode('utf-8')
+
+        # check if we received a full message
+        # if so, remove the message from the buffer and pass msg along
+        if '\r\n' in self._recv_buffer:
+            message, _, self._recv_buffer = self._recv_buffer.partition('\r\n')
+            self.message_received(json.loads(message))
 
     def send_msg(self, data):
         """ This function takes a dictionary

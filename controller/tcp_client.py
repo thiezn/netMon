@@ -17,20 +17,13 @@ class MessageHandler:
         self.controller_port = controller_port
         self.is_connected = False
 
-    def handle_recv_queue(self):
-        """ This handles any potential messages in the
-        message queue """
-
-        if not self.protocol.msg_queue.empty():
-            print('got message {}'.format(self.protocol.msg_queue.get()))
-
     def register(self):
         """ Registers to the controller """
 
-        self.protocol = ConnectionProtocol(self.controller_addr,
-                                           self.controller_port)
         print("Registering to controller {}:{}".format(self.controller_addr,
                                                        self.controller_port))
+        self.protocol = ConnectionProtocol(self.controller_addr,
+                                           self.controller_port)
         self.is_connected = True
         message = {'type': 'register',
                    'version': '0.1',
@@ -46,9 +39,10 @@ class MessageHandler:
 
         print("Unregistering from controller {}:{}"
               .format(self.controller_addr, self.controller_port))
-        self.is_connected = False
         message = {'type': 'unregister'}
         self.protocol.send_message(message)
+        self.protocol.close()
+        self.is_connected = False
 
     def heartbeat(self):
         """ Sends a heartbeat message to the controller
@@ -74,7 +68,6 @@ class ConnectionProtocol:
     def __init__(self, hub_address, hub_port):
         """ Set up the TCP connection to the controller node """
         self.recv_queue = queue.Queue()
-        self.msg_queue = queue.Queue()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((hub_address, hub_port))
         self.sock.setblocking(0)
@@ -82,9 +75,9 @@ class ConnectionProtocol:
     def send_message(self, message):
         """ Sends a message to the controller node """
 
-        message = (json.dumps(message) + "\r\n").encode('ascii')
+        message = json.dumps(message) + '\r\n'
         try:
-            self.sock.send(message)
+            self.sock.send(message.encode('utf-8'))
         except BlockingIOError:
             # This gets raised when the send queue is full
             print("Send buffer full, can't send message {}".format(message))
@@ -97,7 +90,7 @@ class ConnectionProtocol:
         """
 
         try:
-            buff = (self.sock.recv(1024)).decode('ascii')
+            buff = (self.sock.recv(1024)).decode('utf-8')
             self.recv_queue.put(json.loads(buff.strip()))
         except BlockingIOError:
             pass
