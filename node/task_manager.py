@@ -5,7 +5,9 @@ from tcp_client import MessageHandler
 import queue
 from tasks import RegisterNode, UnregisterNode
 import time
+import logging
 
+logger = logging.getLogger(__name__)
 
 class TaskManager:
 
@@ -28,6 +30,7 @@ class TaskManager:
         Here we will start the messsage_handler and
         run the main task loop in a seperate thread """
 
+        logger.info('Starting task manager thread')
         self._manager_thread = Thread(target=self._task_manager,
                                       args=(self._task_queue,
                                             self.message_handler))
@@ -37,6 +40,7 @@ class TaskManager:
     def stop(self):
         """ Gracefully stops the task manager """
 
+        logger.info('Stopping task manager...')
         # unregister us from the message_handler
         self.add(UnregisterNode())
 
@@ -47,6 +51,8 @@ class TaskManager:
 
     def add(self, task):
         """ Adds a new task to the queue """
+        logger.debug('Task {} added to the task_manager queue'
+                          .format(task.name))
         self._task_queue.put(task)
 
     def _task_manager(self, task_queue, message_handler):
@@ -54,8 +60,8 @@ class TaskManager:
         if not self.message_handler.is_connected:
             # Register to the controller
             self.add(RegisterNode())
-        while True:
 
+        while True:
             # First lets handle all the queued tasks
             if not self._task_queue.empty():
                 current_task = self._task_queue.get()
@@ -71,6 +77,7 @@ class TaskManager:
                     elif(current_task.name == 'UnregisterNode' and
                          self.message_handler.is_connected):
                         current_task.run(self.message_handler)
+                        logging.info('Task manager stopped')
                         break
                     elif 'IcmpProbe' in current_task.name:
                         current_task.run(self.message_handler)
@@ -84,8 +91,9 @@ class TaskManager:
 
             # Now lets see if there are any messages received
             # from the controller.
-            # TODO: I guess a lot of this logic should go into the message_handler
-            # class instead of accessing the protocol directly
+            # TODO: I guess a lot of this logic should go into the
+            # message_handler class instead of accessing the protocol
+            # directly
             self.message_handler.protocol.recv_message()
             if not self.message_handler.protocol.recv_queue.empty():
                 print(self.message_handler.protocol.recv_queue.get())

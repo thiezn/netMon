@@ -7,6 +7,9 @@ import json
 import queue
 import socket
 from time import sleep
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MessageHandler:
@@ -21,8 +24,8 @@ class MessageHandler:
     def register(self):
         """ Registers to the controller """
 
-        print("Registering to controller {}:{}".format(self.controller_addr,
-                                                       self.controller_port))
+        logger.info("Registering to controller {}:{}"
+                    .format(self.controller_addr, self.controller_port))
         self.protocol = ConnectionProtocol(self.controller_addr,
                                            self.controller_port)
         self.is_connected = True
@@ -38,8 +41,8 @@ class MessageHandler:
     def unregister(self):
         """ Unregisters from the controller """
 
-        print("Unregistering from controller {}:{}"
-              .format(self.controller_addr, self.controller_port))
+        logger.info("Unregistering from controller {}:{}"
+                     .format(self.controller_addr, self.controller_port))
         message = {'type': 'unregister'}
         self.protocol.send_message(message)
         self.protocol.close()
@@ -89,7 +92,8 @@ class ConnectionProtocol:
             self.sock.send(message.encode('utf-8'))
         except BlockingIOError:
             # This gets raised when the send queue is full
-            print("Send buffer full, can't send message {}".format(message))
+            logger.debug("Send buffer full, can't send message {}"
+                         .format(message))
 
     def recv_message(self):
         """ Returns a message received from the controller

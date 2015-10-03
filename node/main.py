@@ -16,8 +16,6 @@ def main():
                         filemode='w',
                         format='%(asctime)s %(levelname)s %(message)s')
 
-    logging.info('Launching the node controller tcp server...(NOT REALLY)')
-
     logging.info('Loading task_manager...')
     task_manager = TaskManager()
 
