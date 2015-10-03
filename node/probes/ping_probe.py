@@ -49,21 +49,14 @@ class PingProbe(Task):
         stdout, stderr = trace.communicate()
 
         result = stdout.splitlines()
-        result = ': '.join([self.dest_addr, result[len(result)-1].decode('utf-8')])
+        result = result[len(result)-1].decode('utf-8')
+        result = result.split()[3].split('/')
+        result = {'type': self.name,
+                  'run_at': self.run_at,
+                  'dest_addr': self.dest_addr,
+                  'min': result[0],
+                  'avg': result[1],
+                  'max': result[2],
+                  'mdev': result[3]}
 
-        """
-        # Parse the traceroute result
-        for line in stdout.splitlines():
-            line = line.decode('utf-8')
-            ip_address = self.extract_ip_from_line(line)
-            rtt = self.extract_rtt_from_line(line)
-            if(ip_address and not line.startswith("traceroute to") and
-               not line.startswith("Tracing")):
-                trace_output.append({'hop': hop, 'ip_address': ip_address,
-                                     'rtt': rtt})
-                hop += 1
-            elif '*' in line:
-                trace_output.append({'hop': hop, 'ip_address': "*"})
-                hop += 1
-        """
         return result

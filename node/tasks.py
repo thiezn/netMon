@@ -37,8 +37,7 @@ class Task:
             self.run_at = run_at
 
     def reschedule(self):
-        """ Check if the Task has to reoccur again and if so
-        returns the task back to the task_manager.
+        """ Check if the Task has to reoccur again
 
         This should be run by the task_manager class each time
         it has run a Task that has the potential to be run again
