@@ -106,6 +106,7 @@ class ConnectionProtocol:
 
     def close(self):
         """ Closes the socket connection """
+        self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
 

@@ -37,7 +37,5 @@ def main():
     except KeyboardInterrupt:
         task_manager.stop()
         print("\nThanks for joining!\n")
-        time.sleep(2)
-
 if __name__ == '__main__':
     main()
