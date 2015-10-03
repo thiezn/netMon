@@ -27,7 +27,7 @@ class TraceProbe(Task):
 
     def run(self):
         """ Runs the traceroute, gets called by the task_manager """
-        print(self.traceroute())
+        return self.traceroute()
 
     def extract_rtt_from_line(self, line):
         """ Fetch the first occurance of the round-trip time of

@@ -28,7 +28,7 @@ class PingProbe(Task):
         self.timeout = timeout
 
     def run(self):
-        print(self.ping())
+        return self.ping()
 
     def ping(self):
         """ Runs a ping using the OS ping function """

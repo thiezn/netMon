@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TaskManager:
 
     def __init__(self):
@@ -32,10 +33,13 @@ class TaskManager:
 
         logger.info('Starting task manager thread')
         self._manager_thread = Thread(target=self._task_manager,
-                                      args=(self._task_queue,
-                                            self.message_handler))
+                                      args=(self.message_handler,))
         self._manager_thread.daemon = True
         self._manager_thread.start()
+
+        self._task_result_thread = Thread(target=self._task_result_handler)
+        self._task_result_thread.daemon = True
+        self._task_result_thread.start()
 
     def stop(self):
         """ Gracefully stops the task manager """
@@ -52,10 +56,16 @@ class TaskManager:
     def add(self, task):
         """ Adds a new task to the queue """
         logger.debug('Task {} added to the task_manager queue'
-                          .format(task.name))
+                     .format(task.name))
         self._task_queue.put(task)
 
-    def _task_manager(self, task_queue, message_handler):
+    def _task_result_handler(self):
+        """ Handles received task results """
+        while True:
+            while not self._task_result_queue.empty():
+                print("got result: {}".format(self._task_result_queue.get()))
+
+    def _task_manager(self, message_handler):
 
         if not self.message_handler.is_connected:
             # Register to the controller
@@ -82,7 +92,7 @@ class TaskManager:
                     elif 'IcmpProbe' in current_task.name:
                         current_task.run(self.message_handler)
                     else:
-                        current_task.run()
+                        self._task_result_queue.put(current_task.run())
 
                     if current_task.reschedule():
                         self._task_queue.put(current_task)
