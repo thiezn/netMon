@@ -48,11 +48,6 @@ class TaskManager:
         # unregister us from the message_handler
         self.add(UnregisterNode())
 
-    def get(self):
-        """ returns a task from the task_result queue
-        returns None if no result is available """
-        pass
-
     def add(self, task):
         """ Adds a new task to the queue """
         logger.debug('Task {} added to the task_manager queue'
