@@ -48,15 +48,32 @@ class PingProbe(Task):
                                  stderr=subprocess.PIPE)
         stdout, stderr = trace.communicate()
 
-        result = stdout.splitlines()
-        result = result[len(result)-1].decode('utf-8')
-        result = result.split()[3].split('/')
-        result = {'type': self.name,
-                  'run_at': self.run_at,
-                  'dest_addr': self.dest_addr,
-                  'min': result[0],
-                  'avg': result[1],
-                  'max': result[2],
-                  'mdev': result[3]}
+        if stderr:
+            return {'type': self.name,
+                    'run_at': self.run_at,
+                    'dest_addr': self.dest_addr,
+                    'error': stderr.decode('utf-8').strip()}
 
-        return result
+        result = stdout.splitlines()
+        second_last_line = result[len(result)-2].decode('utf-8').split()
+        last_line = result[len(result)-1].decode('utf-8')
+        if not last_line:
+            # if the last line is empty
+            # none of the packets arrived
+            return {'type': self.name,
+                    'run_at': self.run_at,
+                    'dest_addr': self.dest_addr,
+                    'error': 'Host unreachable',
+                    'packets_sent': second_last_line[0],
+                    'packets_recv': second_last_line[3]}
+        else:
+            last_line = last_line.split()[3].split('/')
+            return {'type': self.name,
+                    'run_at': self.run_at,
+                    'dest_addr': self.dest_addr,
+                    'min': result[0],
+                    'avg': result[1],
+                    'max': result[2],
+                    'mdev': result[3],
+                    'packets_sent': second_last_line[0],
+                    'packets_recv': second_last_line[3]}

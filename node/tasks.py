@@ -45,6 +45,7 @@ class Task:
 
         if self.recurrence_time and not self.recurrence_count:
             # persistent reoccuring task
+            self.run_at += self.recurrence_time
             return True
         elif self.recurrence_time and self.recurrence_count > 1:
             self.run_at += self.recurrence_time

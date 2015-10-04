@@ -28,6 +28,8 @@ def main():
                                    recurrence_time=1, recurrence_count=10))
         task_manager.add(PingProbe('149.210.184.36', recurrence_time=15))
         task_manager.add(TraceProbe('8.8.8.8'))
+        task_manager.add(PingProbe('bla'))
+        task_manager.add(PingProbe('10.0.0.1'))
         while True:
             # Here we can send probes to the task_manager
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
