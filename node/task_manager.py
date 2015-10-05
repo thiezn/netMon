@@ -6,6 +6,7 @@ import queue
 from tasks import RegisterNode, UnregisterNode
 import time
 import logging
+from probe_storage import ProbeStorage
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,8 @@ class TaskManager:
         self._task_queue = queue.Queue()
         self._task_result_queue = queue.Queue()
         self.message_handler = MessageHandler('127.0.0.1', 10666)
+        self.probe_storage = ProbeStorage()
+        self.probe_storage.clear_db()
 
     def __repr__(self):
         """ Print the current queue contents """
@@ -44,6 +47,8 @@ class TaskManager:
     def stop(self):
         """ Gracefully stops the task manager """
 
+        logger.debug('These are all the stored probes in the DB')
+        self.probe_storage.get_probes()
         logger.info('Stopping task manager...')
         # unregister us from the message_handler
         self.add(UnregisterNode())
@@ -58,7 +63,9 @@ class TaskManager:
         """ Handles received task results """
         while True:
             while not self._task_result_queue.empty():
-                print("got result: {}".format(self._task_result_queue.get()))
+                result = self._task_result_queue.get()
+                print("adding to db: {}".format(result))
+                self.probe_storage.write(result)
 
     def _task_manager(self, message_handler):
 

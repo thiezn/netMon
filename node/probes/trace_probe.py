@@ -20,7 +20,7 @@ class TraceProbe(Task):
         super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
                          recurrence_count=recurrence_count,
-                         is_remote = False)
+                         is_remote=False)
         self.dest_ip = dest_ip
         self.wait_time = wait_time
         self.max_hops = max_hops
@@ -87,18 +87,18 @@ class TraceProbe(Task):
 
         # Parse the traceroute result
         hop = 1
-        trace_output = []
+        trace_output = {'type': self.name, 'run_at': self.run_at}
         for line in stdout.splitlines():
             line = line.decode('utf-8')
             ip_address = self.extract_ip_from_line(line)
             rtt = self.extract_rtt_from_line(line)
             if(ip_address and not line.startswith("traceroute to") and
                not line.startswith("Tracing")):
-                trace_output.append({'hop': hop, 'ip_address': ip_address,
-                                     'rtt': rtt})
+                trace_output['hop%d' % hop] = {'ip_address': ip_address,
+                                               'rtt': rtt}
                 hop += 1
             elif '*' in line:
-                trace_output.append({'hop': hop, 'ip_address': "*"})
+                trace_output['hop%d' % hop] = {'ip_address': '*'}
                 hop += 1
 
         return trace_output
