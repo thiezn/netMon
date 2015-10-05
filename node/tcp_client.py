@@ -42,7 +42,7 @@ class MessageHandler:
         """ Unregisters from the controller """
 
         logger.info("Unregistering from controller {}:{}"
-                     .format(self.controller_addr, self.controller_port))
+                    .format(self.controller_addr, self.controller_port))
         message = {'type': 'unregister'}
         self.protocol.send_message(message)
         self.protocol.close()
@@ -71,6 +71,8 @@ class ConnectionProtocol:
 
     def __init__(self, server_address, server_port):
         """ Set up the TCP connection to the controller node """
+        self._recv_buffer = ''
+
         self.recv_queue = queue.Queue()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while True:
@@ -103,10 +105,24 @@ class ConnectionProtocol:
         """
 
         try:
+            self._recv_buffer += (self.sock.recv(1024)).decode('utf-8')
+        except BlockingIOError:
+            pass
+
+        # check if we received a full message
+        # if so, remove the message from the buffer and pass msg along
+        if '\r\n' in self._recv_buffer:
+            message, _, self._recv_buffer = self._recv_buffer.partition('\r\n')
+            self.recv_queue.put(json.loads(message))
+
+        """
+        old code
+        try:
             buff = (self.sock.recv(1024)).decode('utf-8')
             self.recv_queue.put(json.loads(buff.strip()))
         except BlockingIOError:
             pass
+        """
 
     def close(self):
         """ Closes the socket connection """
