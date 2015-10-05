@@ -12,7 +12,7 @@ class Task:
         recurrence_count: how often should the task re-occur
     """
 
-    def __init__(self, run_at="now", is_remote=True,
+    def __init__(self, task_storage, run_at="now", is_remote=True,
                  recurrence_time=None, recurrence_count=0):
         """ Define the task name, set the run at time and define
          recurrence if any
@@ -23,11 +23,15 @@ class Task:
             recurrence_count: how often should the task reoccur
             is_remote: Set to True if it needs to communicate to the tcp_server
         """
-
+        self.task_storage = task_storage
         self.name = self.__class__.__name__
         self.recurrence_time = recurrence_time
         self.recurrence_count = recurrence_count
         self.is_remote = is_remote
+        self.task_id = task_storage.add({'type': self.name,
+                                         'recurrence_time': recurrence_time,
+                                         'recurrence_count': recurrence_count,
+                                         'run_at': run_at})
 
         if recurrence_count and not recurrence_time:
             raise ValueError('Have to provide recurrence_time when '

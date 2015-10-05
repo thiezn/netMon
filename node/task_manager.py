@@ -6,7 +6,7 @@ import queue
 from tasks import RegisterNode, UnregisterNode
 import time
 import logging
-from probe_storage import ProbeStorage
+from task_storage import TaskStorage
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ class TaskManager:
         self._task_queue = queue.Queue()
         self._task_result_queue = queue.Queue()
         self.message_handler = MessageHandler('127.0.0.1', 10666)
-        self.probe_storage = ProbeStorage()
-        self.probe_storage.clear_db()
+        self.task_storage = TaskStorage()
+        self.task_storage.clear_db()
 
     def __repr__(self):
         """ Print the current queue contents """
@@ -47,11 +47,9 @@ class TaskManager:
     def stop(self):
         """ Gracefully stops the task manager """
 
-        logger.debug('These are all the stored probes in the DB')
-        self.probe_storage.get_probes()
         logger.info('Stopping task manager...')
         # unregister us from the message_handler
-        self.add(UnregisterNode())
+        self.add(UnregisterNode(self.task_storage))
 
     def add(self, task):
         """ Adds a new task to the queue """
@@ -63,15 +61,15 @@ class TaskManager:
         """ Handles received task results """
         while True:
             while not self._task_result_queue.empty():
-                result = self._task_result_queue.get()
-                print("adding to db: {}".format(result))
-                self.probe_storage.write(result)
+                task = self._task_result_queue.get()
+                print("Updating task ID {}".format(task.task_id))
+                self.task_storage.update(task)
 
     def _task_manager(self, message_handler):
 
         if not self.message_handler.is_connected:
             # Register to the controller
-            self.add(RegisterNode())
+            self.add(RegisterNode(self.task_storage))
 
         while True:
             # First lets handle all the queued tasks
@@ -92,12 +90,12 @@ class TaskManager:
                         # Task needs to communicate with the server
                         result = current_task.run(self.message_handler)
                         if result:
-                            self._task_result_queue.put(result)
+                            self._task_result_queue.put(current_task)
                     else:
                         # Task runs locally on Node
                         result = current_task.run()
                         if result:
-                            self._task_result_queue.put(result)
+                            self._task_result_queue.put(current_task)
 
                     if current_task.reschedule():
                         # reschedule the task if needed

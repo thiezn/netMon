@@ -14,10 +14,12 @@ from tasks import Task
 
 class TraceProbe(Task):
 
-    def __init__(self, dest_addr, wait_time='1', max_hops='20', icmp=True,
-                 run_at="now", recurrence_time=None, recurrence_count=None):
+    def __init__(self, task_storage, dest_addr, wait_time='1', max_hops='20',
+                 icmp=True, run_at="now", recurrence_time=None,
+                 recurrence_count=None):
         """ initialize  Task scheduling and traceroute options """
-        super().__init__(run_at=run_at,
+        super().__init__(task_storage,
+                         run_at=run_at,
                          recurrence_time=recurrence_time,
                          recurrence_count=recurrence_count,
                          is_remote=False)
@@ -87,19 +89,23 @@ class TraceProbe(Task):
 
         # Parse the traceroute result
         hop = 1
-        trace_output = {'type': self.name, 'run_at': self.run_at,
-                        'dest_addr': self.dest_addr}
+        self.result = {'timestamp': self.run_at}
+
+        if stderr:
+            self.result['error'] = stderr
+            return True
+
         for line in stdout.splitlines():
             line = line.decode('utf-8')
             ip_address = self.extract_ip_from_line(line)
             rtt = self.extract_rtt_from_line(line)
             if(ip_address and not line.startswith("traceroute to") and
                not line.startswith("Tracing")):
-                trace_output['hop%d' % hop] = {'ip_address': ip_address,
-                                               'rtt': rtt}
+                self.result['%d' % hop] = {'ip_address': ip_address,
+                                           'rtt': rtt}
                 hop += 1
             elif '*' in line:
-                trace_output['hop%d' % hop] = {'ip_address': '*'}
+                self.result['%d' % hop] = {'ip_address': '*'}
                 hop += 1
 
-        return trace_output
+        return True
