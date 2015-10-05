@@ -14,14 +14,14 @@ from tasks import Task
 
 class TraceProbe(Task):
 
-    def __init__(self, dest_ip, wait_time='1', max_hops='20', icmp=True,
+    def __init__(self, dest_addr, wait_time='1', max_hops='20', icmp=True,
                  run_at="now", recurrence_time=None, recurrence_count=None):
         """ initialize  Task scheduling and traceroute options """
         super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
                          recurrence_count=recurrence_count,
                          is_remote=False)
-        self.dest_ip = dest_ip
+        self.dest_addr = dest_addr
         self.wait_time = wait_time
         self.max_hops = max_hops
         self.icmp = icmp
@@ -67,18 +67,18 @@ class TraceProbe(Task):
                 # Use TCP traceroute to be able to traverse firewall
                 parameters = ["sudo", "traceroute", "-I", "-n",
                               "-w " + self.wait_time, "-m " + self.max_hops,
-                              "-n", "-q 1", self.dest_ip]
+                              "-n", "-q 1", self.dest_addr]
             else:
                 # normal udp based traceroute
                 parameters = ["traceroute", "-n", "-w " + self.wait_time,
                               "-m " + self.max_hops, "-n", "-q 1",
-                              self.dest_ip]
+                              self.dest_addr]
         else:
             # assume we're on windows.. Yes I know, maybe
             # someday we'll introduce MacOS support :)
             parameters = ["C:\Windows\System32\\tracert.exe", "-d",
                           "-w", self.wait_time, '-h', self.max_hops,
-                          self.dest_ip]
+                          self.dest_addr]
 
         trace = subprocess.Popen(parameters,
                                  stdout=subprocess.PIPE,
@@ -87,7 +87,8 @@ class TraceProbe(Task):
 
         # Parse the traceroute result
         hop = 1
-        trace_output = {'type': self.name, 'run_at': self.run_at}
+        trace_output = {'type': self.name, 'run_at': self.run_at,
+                        'dest_addr': self.dest_addr}
         for line in stdout.splitlines():
             line = line.decode('utf-8')
             ip_address = self.extract_ip_from_line(line)

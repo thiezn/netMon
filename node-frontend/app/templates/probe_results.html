@@ -1,0 +1,48 @@
+<h2>Ping Probes</h2>
+<table border=1>
+  <tr>
+    <th>timestamp</th>
+    <th>dest addr</th>
+    <th>min</th>
+    <th>avg</th>
+    <th>max</th>
+    <th>error</th>
+  </tr>
+  {% for probe in probes %}
+  {% if probe['type'] == 'PingProbe' %}
+  <tr>
+      <td>{{probe['run_at']}}</td>
+      <td>{{probe['dest_addr']}}</td>
+      <td>{{probe['min']}}</td>
+      <td>{{probe['avg']}}</td>
+      <td>{{probe['max']}}</td>
+      <td>{{probe['error']}}</td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
+
+<h2>Trace Probes</h2>
+{% for probe in probes %}
+  {% if probe['type'] == 'TraceProbe' %}
+
+    <h3>{{probe['dest_addr']}} - {{probe['run_at']}}</h3>
+    <table border=1>
+      <tr>
+        <th>hop</th>
+        <th>address</th>
+        <th>rtt</th>
+      </tr>
+      {% for key, value in probe.items() %}
+        {% if 'hop' in key: %}
+          <tr>
+            <td>{{key}}</td>
+            <td>{{value['ip_address']}}</td>
+            <td>{{value['rtt']}}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endfor %}
+

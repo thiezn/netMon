@@ -72,9 +72,9 @@ class PingProbe(Task):
             return {'type': self.name,
                     'run_at': self.run_at,
                     'dest_addr': self.dest_addr,
-                    'min': result[0],
-                    'avg': result[1],
-                    'max': result[2],
-                    'mdev': result[3],
+                    'min': last_line[0],
+                    'avg': last_line[1],
+                    'max': last_line[2],
+                    'mdev': last_line[3],
                     'packets_sent': second_last_line[0],
                     'packets_recv': second_last_line[3]}
