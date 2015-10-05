@@ -21,7 +21,8 @@ class PingProbe(Task):
 
         super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
-                         recurrence_count=recurrence_count)
+                         recurrence_count=recurrence_count,
+                         is_remote = False)
         self.dest_addr = dest_addr
         self.count = count
         self.preload = preload

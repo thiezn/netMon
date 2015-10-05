@@ -14,12 +14,13 @@ from tasks import Task
 
 class TraceProbe(Task):
 
-    def __init__(self, dest_ip, wait_time='1', max_hops='20', icmp=False,
+    def __init__(self, dest_ip, wait_time='1', max_hops='20', icmp=True,
                  run_at="now", recurrence_time=None, recurrence_count=None):
         """ initialize  Task scheduling and traceroute options """
         super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
-                         recurrence_count=recurrence_count)
+                         recurrence_count=recurrence_count,
+                         is_remote = False)
         self.dest_ip = dest_ip
         self.wait_time = wait_time
         self.max_hops = max_hops

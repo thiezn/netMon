@@ -75,21 +75,25 @@ class TaskManager:
                 # If not, add it to the back of the queue
                 if current_task.run_at <= time.time():
 
-                    if(current_task.name == 'RegisterNode' and
-                       not self.message_handler.is_connected):
-                        current_task.run(self.message_handler)
-
-                    elif(current_task.name == 'UnregisterNode' and
-                         self.message_handler.is_connected):
+                    if(current_task.name == 'UnregisterNode'):
+                        # Quit the task_manager when this is handled
                         current_task.run(self.message_handler)
                         logging.info('Task manager stopped')
                         break
-                    elif 'IcmpProbe' in current_task.name:
-                        current_task.run(self.message_handler)
+
+                    if current_task.is_remote:
+                        # Task needs to communicate with the server
+                        result = current_task.run(self.message_handler)
+                        if result:
+                            self._task_result_queue.put(result)
                     else:
-                        self._task_result_queue.put(current_task.run())
+                        # Task runs locally on Node
+                        result = current_task.run()
+                        if result:
+                            self._task_result_queue.put(result)
 
                     if current_task.reschedule():
+                        # reschedule the task if needed
                         self._task_queue.put(current_task)
                 else:
                     self._task_queue.put(current_task)
