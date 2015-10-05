@@ -52,7 +52,7 @@ class PingProbe(Task):
         stdout, stderr = trace.communicate()
 
         if stderr:
-            self.result = {'timestamp': self.run_at, 
+            self.result = {'timestamp': self.run_at,
                            'error': stderr.decode('utf-8').strip()}
             return False
 

@@ -1,0 +1,51 @@
+<h2>Ping Probes</h2>
+
+{% for task in tasks %}
+<h2>{{task['dest_addr']}}</h2>
+{% if task['type'] == 'PingProbe' %}
+<table border=1>
+  <tr>
+    <th>timestamp</th>
+    <th>min</th>
+    <th>avg</th>
+    <th>max</th>
+    <th>error</th>
+  </tr>
+  {% for result in task['result'] %}
+  <tr>
+      <td>{{result['timestamp']}}</td>
+      <td>{{result['min']}}</td>
+      <td>{{result['avg']}}</td>
+      <td>{{result['max']}}</td>
+      <td>{{result['error']}}</td>
+  </tr>
+  {% endfor %}
+  {% endif %}
+</table>
+{% endfor %}
+
+<h2>Trace Probes</h2>
+{% for task in tasks %}
+  {% if task['type'] == 'TraceProbe' %}
+    <h3>{{task['dest_addr']}} - {{task['run_at']}}</h3>
+    <table border=1>
+      <tr>
+        <th>hop</th>
+        <th>address</th>
+        <th>rtt</th>
+      </tr>
+      {% for row in task['result'] %}
+      {% for key, value in row.items() %}
+        {% if key != 'timestamp' %}
+          <tr>
+            <td>{{key}}</td>
+            <td>{{value['ip_address']}}</td>
+            <td>{{value['rtt']}}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endfor %}
+

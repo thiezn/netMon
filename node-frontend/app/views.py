@@ -3,38 +3,36 @@
 from app import app
 from pymongo import MongoClient
 from flask import render_template
-from datetime import datetime
 
 
-class ProbeStorage:
+class TaskStorage:
 
     def __init__(self, db_addr='127.0.0.1', db_port=27017):
         self.session = MongoClient(db_addr, db_port)
-        self.db = self.session.probe_database
-        self.probes = self.db.probe_collection
-        self.probe_ids = []
+        self.db = self.session.task_database
+        self.tasks = self.db.task_collection
+        self.task_ids = []
 
-    def get_probes(self):
-        """ Prints out all probes """
-        return self.probes.find()
+    def get_tasks(self):
+        """ Prints out all tasks """
+        return self.tasks.find()
 
 
 if __name__ == '__main__':
-    probe_storage = ProbeStorage()
-    probe_storage.clear_db()
-    probe_storage.write({'test': 'test'})
-    probe_storage.get_probes()
+    task_storage = TaskStorage()
+    task_storage.clear_db()
+    task_storage.write({'test': 'test'})
+    task_storage.get_tasks()
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    probe_storage = ProbeStorage()
-    result = probe_storage.get_probes()
+    task_storage = TaskStorage()
+    result = task_storage.get_tasks()
 
-    probes = []
-    for probe in result:
-        probe['run_at'] = datetime.fromtimestamp(int(probe['run_at']))
-        probes.append(probe)
+    tasks = []
+    for task in result:
+        tasks.append(task)
 
-    return render_template("probe_results.html", probes=probes)
+    return render_template("task_results.html", tasks=tasks)

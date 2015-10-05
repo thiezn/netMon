@@ -23,6 +23,15 @@ class Task:
             recurrence_count: how often should the task reoccur
             is_remote: Set to True if it needs to communicate to the tcp_server
         """
+        if recurrence_count and not recurrence_time:
+            raise ValueError('Have to provide recurrence_time when '
+                             'providing recurrence_count')
+
+        if run_at == "now":
+            self.run_at = time.time()
+        else:
+            self.run_at = run_at
+
         self.task_storage = task_storage
         self.name = self.__class__.__name__
         self.recurrence_time = recurrence_time
@@ -32,15 +41,6 @@ class Task:
                                          'recurrence_time': recurrence_time,
                                          'recurrence_count': recurrence_count,
                                          'run_at': run_at})
-
-        if recurrence_count and not recurrence_time:
-            raise ValueError('Have to provide recurrence_time when '
-                             'providing recurrence_count')
-
-        if run_at == "now":
-            self.run_at = time.time()
-        else:
-            self.run_at = run_at
 
     def reschedule(self):
         """ Check if the Task has to reoccur again
