@@ -26,7 +26,8 @@ class TaskStorage:
             task_id: _id value of mongodb document
         """
         logger.info('adding task to the queue: {}'.format(task))
-        return self.tasks.insert_one(task).inserted_id
+        task
+        return self.tasks.insert_one(task.db_record()).inserted_id
 
     def update(self, task, upsert=False):
         """ Updates a task Task with the latest result

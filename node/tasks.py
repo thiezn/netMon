@@ -12,7 +12,7 @@ class Task:
         recurrence_count: how often should the task re-occur
     """
 
-    def __init__(self, task_storage, run_at="now", is_remote=True,
+    def __init__(self, run_at="now", is_remote=True,
                  recurrence_time=None, recurrence_count=0):
         """ Define the task name, set the run at time and define
          recurrence if any
@@ -32,15 +32,18 @@ class Task:
         else:
             self.run_at = run_at
 
-        self.task_storage = task_storage
         self.name = self.__class__.__name__
         self.recurrence_time = recurrence_time
         self.recurrence_count = recurrence_count
         self.is_remote = is_remote
-        self.task_id = task_storage.add({'type': self.name,
-                                         'recurrence_time': recurrence_time,
-                                         'recurrence_count': recurrence_count,
-                                         'run_at': run_at})
+
+    def db_record(self):
+        """ Should return what we want to write to the
+        database """
+        return {'type': self.name,
+                'recurrence_time': self.recurrence_time,
+                'recurrence_count': self.recurrence_count,
+                'run_at': self.run_at}
 
     def reschedule(self):
         """ Check if the Task has to reoccur again
@@ -54,10 +57,12 @@ class Task:
             self.run_at += self.recurrence_time
             return True
         elif self.recurrence_time and self.recurrence_count > 1:
+            # no persistent reoccuring task
             self.run_at += self.recurrence_time
             self.recurrence_count -= 1
             return True
         else:
+            # one off task
             return False
 
     def run(self):

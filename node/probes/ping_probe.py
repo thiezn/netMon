@@ -3,12 +3,13 @@
 from tasks import Task
 import subprocess
 import sys
+import ipaddress
 
 
 class PingProbe(Task):
     """ Runs an ICMP probe to the provided destination """
 
-    def __init__(self, task_storage, dest_addr, count='10', preload='10',
+    def __init__(self, dest_addr, count='10', preload='10',
                  timeout='1', run_at="now", recurrence_time=None,
                  recurrence_count=None):
         """ Making sure to pass on the scheduling variables to the
@@ -20,21 +21,37 @@ class PingProbe(Task):
             timeout: amount of seconds before a probe times out
         """
 
-        super().__init__(task_storage,
-                         run_at=run_at,
+        super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
                          recurrence_count=recurrence_count,
                          is_remote=False)
         self.dest_addr = dest_addr
+        ipaddress.ip_address(dest_addr)  # Check if we have valid ip
         self.count = count
         self.preload = preload
         self.timeout = timeout
+
+    def db_record(self):
+        """ Should return what we want to write to the
+        database """
+        return {'type': self.name,
+                'recurrence_time': self.recurrence_time,
+                'recurrence_count': self.recurrence_count,
+                'run_at': self.run_at,
+                'dest_addr': self.dest_addr,
+                'timeout': self.timeout,
+                'count': self.count,
+                'preload': self.preload}
 
     def run(self):
         return self.ping()
 
     def ping(self):
-        """ Runs a ping using the OS ping function """
+        """ Runs a ping using the OS ping function
+
+        Returns:
+            True: Returns true if the probe was succesful
+        """
 
         if sys.platform.startswith('linux'):
             parameters = ["ping", self.dest_addr,
@@ -54,11 +71,11 @@ class PingProbe(Task):
         if stderr:
             self.result = {'timestamp': self.run_at,
                            'error': stderr.decode('utf-8').strip()}
-            return False
+            return True
 
-        result = stdout.splitlines()
-        second_last_line = result[len(result)-2].decode('utf-8').split()
-        last_line = result[len(result)-1].decode('utf-8')
+        lines = stdout.splitlines()
+        second_last_line = lines[len(lines)-2].decode('utf-8').split()
+        last_line = lines[len(lines)-1].decode('utf-8')
         if not last_line:
             # if the last line is empty
             # none of the packets arrived

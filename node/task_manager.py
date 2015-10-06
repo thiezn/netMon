@@ -49,13 +49,14 @@ class TaskManager:
 
         logger.info('Stopping task manager...')
         # unregister us from the message_handler
-        self.add(UnregisterNode(self.task_storage))
+        self.add(UnregisterNode())
 
     def add(self, task):
         """ Adds a new task to the queue """
         logger.debug('Task {} added to the task_manager queue'
                      .format(task.name))
         self._task_queue.put(task)
+        task.task_id = self.task_storage.add(task)
 
     def _task_result_handler(self):
         """ Handles received task results """
@@ -69,7 +70,7 @@ class TaskManager:
 
         if not self.message_handler.is_connected:
             # Register to the controller
-            self.add(RegisterNode(self.task_storage))
+            self.add(RegisterNode())
 
         while True:
             # First lets handle all the queued tasks

@@ -1,8 +1,8 @@
 <h2>Ping Probes</h2>
 
 {% for task in tasks %}
-<h2>{{task['dest_addr']}}</h2>
 {% if task['type'] == 'PingProbe' %}
+<h2>{{task['dest_addr']}} - {{task['run_at']}}</h2>
 <table border=1>
   <tr>
     <th>timestamp</th>
@@ -28,13 +28,14 @@
 {% for task in tasks %}
   {% if task['type'] == 'TraceProbe' %}
     <h3>{{task['dest_addr']}} - {{task['run_at']}}</h3>
+      {% for row in task['result'] %}
     <table border=1>
       <tr>
         <th>hop</th>
         <th>address</th>
         <th>rtt</th>
       </tr>
-      {% for row in task['result'] %}
+
       {% for key, value in row.items() %}
         {% if key != 'timestamp' %}
           <tr>

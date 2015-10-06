@@ -10,20 +10,21 @@ import sys
 import subprocess       # For calling external shell commands
 import re               # used for regular expression matching
 from tasks import Task
+import ipaddress
 
 
 class TraceProbe(Task):
 
-    def __init__(self, task_storage, dest_addr, wait_time='1', max_hops='20',
+    def __init__(self, dest_addr, wait_time='1', max_hops='20',
                  icmp=True, run_at="now", recurrence_time=None,
                  recurrence_count=None):
         """ initialize  Task scheduling and traceroute options """
-        super().__init__(task_storage,
-                         run_at=run_at,
+        super().__init__(run_at=run_at,
                          recurrence_time=recurrence_time,
                          recurrence_count=recurrence_count,
                          is_remote=False)
         self.dest_addr = dest_addr
+        ipaddress.ip_address(dest_addr)  # check if valid ip
         self.wait_time = wait_time
         self.max_hops = max_hops
         self.icmp = icmp
@@ -59,6 +60,17 @@ class TraceProbe(Task):
             return match.group()
         else:
             return None
+
+    def db_record(self):
+        """ Should return what we want to write to the
+        database """
+        return {'type': self.name,
+                'recurrence_time': self.recurrence_time,
+                'recurrence_count': self.recurrence_count,
+                'run_at': self.run_at,
+                'dest_addr': self.dest_addr,
+                'wait_time': self.wait_time,
+                'max_hops': self.max_hops}
 
     def traceroute(self):
         """ This command runs a traceroute and returns
