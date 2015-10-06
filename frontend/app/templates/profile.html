@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block header %}
+  {% if session['signed'] and session['name']== user.name %}
+    <link href="/static/js/x-editable/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>{{user.name}}'s profile</h4>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item">Email
+                <a href="#" class="pull-right" id="email" data-type="email" data-url="/user_edit_email" data-pk="{{user.id}}" data-title="Change your email">
+                    {{ user.email }}
+                </a>
+            </li>
+        </ul>
+        <div class="panel-footer">
+            <span class="small">member since {{ user.datecreated }}</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/x-editable/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+<script type="text/javascript">
+
+	//$.fn.editable.defaults.mode = 'inline';		// comment out this line if you would rather have a popup for editing
+
+        $('#firstname').editable({
+            placement: "right",
+            error: function (errors) {
+            }
+        });
+
+        $('#lastname').editable({
+            placement: "right",
+            error: function (errors) {
+            }
+        });
+
+        $('#email').editable({
+            placement: "right",
+            error: function (errors) {
+            }
+        });
+
+        $('#bio').editable({
+            placement: "right",
+            error: function (errors) {
+            }
+        });
+
+</script>
+
+{% endblock %}
+

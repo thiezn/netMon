@@ -1,0 +1,88 @@
+{% extends "layout-no-nav.html" %}
+{% block content %}
+
+<h1>Welcome to MusicSite</h1>
+<div class="row">
+  <div class="col-sm-6">
+    <form action="{{url_for('login')}}" class="form-horizontal" method="POST">
+        {{ loginform.hidden_tag() }}
+        <div class="heading">
+          <h4 class="form-heading">Login to musicsite</h4>
+        </div>
+        <div class="form-group {% if loginform.name.errors %} has-error {% endif %}">
+          {{ loginform.name.label(class="col-sm-2") }}
+          <div class="col-sm-8">
+            {{ loginform.name(placeholder="E.g. johndoe", class="form-control") }}
+          </div>
+        </div>
+
+        <div class="form-group {% if loginform.password.errors %} has-error {% endif %}">
+          {{ loginform.password.label(class="col-sm-2") }}
+          <div class="col-sm-8">
+            {{ loginform.password(placeholder="Min. 6 Characters", class="form-control") }}
+          </div>
+        </div>
+
+        <div class="form-group {% if loginform.remember_me.errors %} has-error {% endif %}">
+          <div class="col-sm-2">
+              {{ loginform.remember_me(class="checkbox") }}
+          </div>
+          {{ loginform.remember_me.label(class="col-sm-8") }}
+        </div>
+
+        <button class="btn btn-success" type="submit">Sign in</button>
+    </form>
+  </div>
+
+  <div class="col-sm-6">
+    <form action="{{url_for('register')}}" class="form-horizontal" method="POST">
+        {{ registerform.hidden_tag() }}
+        <div class="heading">
+          <h4 class="form-heading">Register for an account on musicsite</h4>
+        </div>
+        <div class="form-group {% if registerform.email.errors %} has-error {% endif %}">
+          {{registerform.email.label(class="col-sm-3")}}
+          <div class="col-sm-7">
+            {{ registerform.email(placeholder="e.g. bruce@wayne.com", class="form-control") }}
+          </div>
+        </div>
+
+        <div class="form-group {% if registerform.password.errors %} has-error {% endif %}">
+          {{ registerform.password.label(class="col-sm-3")}}
+          <div class="col-sm-7">
+            {{ registerform.password(placeholder="Min. 6 Characters", class="form-control") }}
+          </div>
+        </div>
+
+        <div class="form-group {% if registerform.name.errors %} has-error {% endif %}">
+          {{ registerform.name.label(class="col-sm-3")}}
+          <div class="col-sm-7">
+            {{ registerform.name(placeholder="e.g. darkKnight", class="form-control")}}
+          </div>
+        </div>
+
+        <div class="form-group {% if registerform.firstname.errors %} has-error {% endif %}">
+          {{ registerform.firstname.label(class="col-sm-3")}}
+          <div class="col-sm-7">
+            {{ registerform.firstname(placeholder="<optional>", class="form-control")}}
+          </div>
+        </div>
+
+        <div class="form-group {% if registerform.lastname.errors %} has-error {% endif %}">
+          {{ registerform.lastname.label(class="col-sm-3")}}
+          <div class="col-sm-7">
+            {{ registerform.lastname(placeholder="<optional>", class="form-control")}}
+          </div>
+        </div>
+
+        <div class="form-group {% if registerform.agree.errors %} has-error {% endif %}">
+          <label class="checkbox col-sm-7">
+              {{ registerform.agree}} <label for="agree">I agree to all your <a href="{{ url_for('terms_of_service') }}">Terms of Service</a></label>
+          </label>
+        </div>
+        <button class="btn btn-success" type="submit">Sign Up</button>
+    </form>
+  </div>
+</div> <!-- row -->
+{% endblock %}
+

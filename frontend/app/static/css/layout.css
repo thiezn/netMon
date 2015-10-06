@@ -1,0 +1,42 @@
+body {					
+  padding-top: 50px;
+}
+
+.content {
+  padding: 40px 15px;		/* added padding to ensure navbar is not overlapping content */
+}
+
+.thumbnail.right-caption > img {
+    float: left;
+    margin-right: 9px;
+}
+
+.thumbnail.right-caption {
+    float: left; 
+}
+
+.thumbnail.right-caption > .caption {
+    padding: 4px;
+}
+
+/* The following enables dropdown menu's that collapse on hover over */
+
+@media only screen and (min-width : 768px) {
+
+    /* Make Navigation Toggle on Desktop Hover */
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+}
+
+/* added the following to fix the indentation issue with inline checkboxes when moving to the second line */
+
+.checkbox-inline.no_indent,
+.checkbox-inline.no_indent+.checkbox-inline.no_indent {
+  margin-left: 0;
+  margin-right: 10px;
+}
+.checkbox-inline.no_indent:last-child {
+  margin-right: 0;
+}
+

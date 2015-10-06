@@ -1,0 +1,8 @@
+Flask<1
+Flask-Login>=0.2
+Flask-SQLAlchemy>=1.0
+Flask-WTF>=0.10
+Jinja2>=2.7.3
+SQLAlchemy>=0.9.7
+WTForms>=2.0.1
+Werkzeug>=0.9.6

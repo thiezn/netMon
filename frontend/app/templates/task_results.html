@@ -1,9 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 <h2>Ping Probes</h2>
 
 {% for task in tasks %}
 {% if task['type'] == 'PingProbe' %}
 <h2>{{task['dest_addr']}} - {{task['run_at']}}</h2>
-<table border=1>
+<table class="table table-striped">
   <tr>
     <th>timestamp</th>
     <th>min</th>
@@ -29,7 +33,7 @@
   {% if task['type'] == 'TraceProbe' %}
     <h3>{{task['dest_addr']}} - {{task['run_at']}}</h3>
       {% for row in task['result'] %}
-    <table border=1>
+    <table class="table table-striped">
       <tr>
         <th>hop</th>
         <th>address</th>
@@ -50,3 +54,5 @@
   {% endif %}
 {% endfor %}
 
+
+{% endblock %}
