@@ -55,8 +55,8 @@ class TaskManager:
         """ Adds a new task to the queue """
         logger.debug('Task {} added to the task_manager queue'
                      .format(task.name))
-        self._task_queue.put(task)
         task.task_id = self.task_storage.add(task)
+        self._task_queue.put(task)
 
     def _task_result_handler(self):
         """ Handles received task results """

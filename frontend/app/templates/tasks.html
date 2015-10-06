@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<table class="table table-striped">
+  <tr>
+    <th>task_id</th>
+    <th>type</th>
+    <th>first run</th>
+    <th>recurrence</th>
+    <th>recurrence time (sec)</th>
+  </tr>
+{% for task in tasks %}
+  <tr>
+      <td><a href='{{ url_for('task', task_id=task['_id']) }}'>{{task['_id']}}</a></td>
+      <td>{{task['type']}}</td>
+      <td>{{task['run_at']}}</td>
+      <td>{{task['recurrence_count']}}</td>
+      <td>{{task['recurrence_time']}}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

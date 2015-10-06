@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import time
-
+from datetime import datetime
 
 class Task:
     """ Class describing a Task for use in the TaskManager
@@ -13,7 +13,7 @@ class Task:
     """
 
     def __init__(self, run_at="now", is_remote=True,
-                 recurrence_time=None, recurrence_count=0):
+                 recurrence_time=None, recurrence_count=None):
         """ Define the task name, set the run at time and define
          recurrence if any
 
@@ -36,6 +36,7 @@ class Task:
         self.recurrence_time = recurrence_time
         self.recurrence_count = recurrence_count
         self.is_remote = is_remote
+        self.task_id = None
 
     def db_record(self):
         """ Should return what we want to write to the
@@ -43,7 +44,7 @@ class Task:
         return {'type': self.name,
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
-                'run_at': self.run_at}
+                'run_at': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S')}
 
     def reschedule(self):
         """ Check if the Task has to reoccur again

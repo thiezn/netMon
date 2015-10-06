@@ -4,7 +4,7 @@ from tasks import Task
 import subprocess
 import sys
 import ipaddress
-
+from datetime import datetime
 
 class PingProbe(Task):
     """ Runs an ICMP probe to the provided destination """
@@ -34,10 +34,11 @@ class PingProbe(Task):
     def db_record(self):
         """ Should return what we want to write to the
         database """
-        return {'type': self.name,
+        return {'task_id': self.task_id,
+                'type': self.name,
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
-                'run_at': self.run_at,
+                'run_at': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
                 'dest_addr': self.dest_addr,
                 'timeout': self.timeout,
                 'count': self.count,
@@ -79,13 +80,13 @@ class PingProbe(Task):
         if not last_line:
             # if the last line is empty
             # none of the packets arrived
-            self.result = {'timestamp': self.run_at,
+            self.result = {'timestamp': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
                            'error': 'Host unreachable',
                            'packets_sent': second_last_line[0],
                            'packets_recv': second_last_line[3]}
         else:
             last_line = last_line.split()[3].split('/')
-            self.result = {'timestamp': self.run_at,
+            self.result = {'timestamp': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
                            'min': last_line[0],
                            'avg': last_line[1],
                            'max': last_line[2],

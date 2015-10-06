@@ -11,7 +11,7 @@ import subprocess       # For calling external shell commands
 import re               # used for regular expression matching
 from tasks import Task
 import ipaddress
-
+from datetime import datetime
 
 class TraceProbe(Task):
 
@@ -64,10 +64,11 @@ class TraceProbe(Task):
     def db_record(self):
         """ Should return what we want to write to the
         database """
-        return {'type': self.name,
+        return {'task_id': self.task_id,
+                'type': self.name,
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
-                'run_at': self.run_at,
+                'run_at': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
                 'dest_addr': self.dest_addr,
                 'wait_time': self.wait_time,
                 'max_hops': self.max_hops}
@@ -102,7 +103,7 @@ class TraceProbe(Task):
         # Parse the traceroute result
         hop = 1
         self.result = {'timestamp': self.run_at}
-
+        
         if stderr:
             self.result['error'] = stderr
             return True

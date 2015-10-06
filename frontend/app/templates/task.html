@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h3>{{ task['_id'] }}</h3>
+<span class='small'>
+    <b>Type</b>         {{ task['type'] }}<br>
+    <b>First run</b>    {{ task['run_at'] }}
+</span>
+<BR><BR>
+
+{% if task['type'] == 'PingProbe' %}
+  <table class="table table-striped">
+      <tr>
+          <th>timestamp</th>
+          <th>min</th>
+          <th>avg</th>
+          <th>max</th>
+          <th>error</th>
+      </tr>
+  {% for result in task['result'] %}
+     <tr>
+         <td>{{result['timestamp']}}</td>
+         <td>{{result['min']}}</td>
+         <td>{{result['avg']}}</td>
+         <td>{{result['max']}}</td>
+         <td>{{result['error']}}</td>
+     </tr>
+  {% endfor %}
+  </table>
+{% elif task['type'] == 'TraceProbe' %}
+  {% for result in task['result'] %}
+  <span class="small"><b>timestamp</b> {{result['timestamp']}}</span>
+  <table class="table table-striped">
+      <tr>
+          <th>hop</th>
+          <th>ip address</th>
+          <th>rtt</th>
+      </tr>
+  {% for key, value in result.items() %}
+    {% if key != 'timestamp' %}
+      <tr>
+          <td>{{key}}</td>
+          <td>{{value['ip_address']}}</td>
+          <td>{{value['rtt']}}</td>
+      </tr>
+    {% endif %}
+  {% endfor %}
+  </table>
+  {% endfor %}
+{% endif %}
+
+
+{% endblock %}

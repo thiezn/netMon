@@ -8,7 +8,7 @@
     <meta name="user" content="">
     <link rel="icon" href="/favicon.ico">
 
-    <title>Musicsite {{title}}</title>
+    <title>netMon {{title}}</title>
 
     {% block header %}
     {% endblock %}
@@ -44,11 +44,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">MusicSite</a>
+          <a class="navbar-brand" href="/">netMon</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-              <li {% if request.path=="/probes" %} class="active" {% endif %}><a href="{{ url_for('probes') }}">Probes</a></l>
+              <li {% if request.path=="/tasks" %} class="active" {% endif %}><a href="{{ url_for('tasks') }}">Tasks</a></l>
              <li {% if request.path=="/about" %} class="active" {% endif %}><a href="{{ url_for('about') }}">About</a></li>
 	         <li {% if request.path=="/contact" %} class="active" {% endif %}><a href="{{ url_for('contact') }}">Contact</a></li>
           </ul>
@@ -101,7 +101,7 @@
     <div class="footer">
         <div class="container">
             {% block footer %}
-            <p class="text-center small">&copy; 2014 <a href="http://www.mortimer.nl">mortimer.nl</a> | <a href="{{ url_for('terms_of_service') }}">Terms of Service</a></p>
+            <p class="text-center small">&copy; 2015 <a href="http://www.github.com/thiezn/netMon">netMon</a> | <a href="{{ url_for('terms_of_service') }}">Terms of Service</a></p>
             {% endblock %}
         </div>
     </div>

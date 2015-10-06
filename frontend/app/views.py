@@ -7,7 +7,7 @@ from flask.ext.login import login_user, logout_user
 from flask.ext.login import current_user, login_required
 import json
 from pymongo import MongoClient
-
+from bson.objectid import ObjectId
 
 
 # Lets get this stuff loaded here quickly,
@@ -25,9 +25,13 @@ class TaskStorage:
         """ Prints out all tasks """
         return self.tasks.find()
 
+    def get_task(self, task_id):
+        """ Returns a single task """
+        return self.tasks.find_one({"_id": ObjectId(task_id)})
 
-@app.route('/probes')
-def probes():
+
+@app.route('/tasks')
+def tasks():
     task_storage = TaskStorage()
     result = task_storage.get_tasks()
 
@@ -35,7 +39,15 @@ def probes():
     for task in result:
         tasks.append(task)
 
-    return render_template("task_results.html", tasks=tasks)
+    return render_template("tasks.html", tasks=tasks)
+
+
+@app.route('/task/<task_id>')
+def task(task_id):
+    task_storage = TaskStorage()
+    task = task_storage.get_task(task_id)
+
+    return render_template("task.html", task=task)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -43,7 +55,7 @@ def home():
     """The route/view for the main page"""
 
     # Check if the user is logged on already
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         user = User.query.filter_by(id=session['id']).first()
 
         # The form either didn't validate or there was no POST request
@@ -103,7 +115,7 @@ def contact():
 def register():
     """The route/view for registering a new user"""
 
-    title = 'Register to musicsite'
+    title = 'Register account'
     if request.method == 'POST':
         form = RegisterForm(request.form)
 
@@ -143,7 +155,7 @@ def login():
     if request.method == 'POST':
 
         # check if user is authenticated
-        if current_user is not None and current_user.is_authenticated():
+        if current_user is not None and current_user.is_authenticated:
             return redirect(url_for('home'))
 
         form = LoginForm(request.form)

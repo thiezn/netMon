@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 import logging
 
@@ -26,7 +27,6 @@ class TaskStorage:
             task_id: _id value of mongodb document
         """
         logger.info('adding task to the queue: {}'.format(task))
-        task
         return self.tasks.insert_one(task.db_record()).inserted_id
 
     def update(self, task, upsert=False):
@@ -48,9 +48,11 @@ class TaskStorage:
         for item in self.tasks.find():
             print(item)
 
+    def get_task(self, task_id):
+        """ Returns a single task """
+        print(self.tasks.find_one({"_id": ObjectId(task_id)}))
+
 
 if __name__ == '__main__':
     task_storage = TaskStorage()
-    task_storage.clear_db()
-    task_storage.add({'test': 'test'})
-    task_storage.get_tasks()
+    task_storage.get_task('56141fabc2aef51205787ecb')
