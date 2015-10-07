@@ -9,20 +9,34 @@ class Configuration:
     """ Configuration details for nodes and controllers """
 
     _BASE_DIR = "cfg/"
-    _TCP_SERVER_FILE = _BASE_DIR + "tcp_server.cfg"
+    _TCP_SERVER_FILE = "tcp_server.cfg"
+    _NODE_MAIN_FILE = "node-main.cfg"
 
-    def __init__(self):
+    def _load_cfg_file(self, filename):
         """ Open configuration files """
 
-        with open(self._TCP_SERVER_FILE) as tcp_server_file:
-            self.tcp_server = json.load(tcp_server_file)[0]
+        url = "%s%s" % (self._BASE_DIR, filename)
+        with open(url) as cfg_file:
+            result = json.load(cfg_file)[0]
 
-        if('server' not in self.tcp_server and
-           'port' not in self.tcp_server):
+        cfg_file.close()
+        return result
+
+    def load_tcp_server(self):
+        config = self._load_cfg_file(self._TCP_SERVER_FILE)
+
+        if('server' not in config and
+           'port' not in config):
             print("server/port not found in {}".format(self._TCP_SERVER_FILE))
         else:
             print("tcp_server {}:{} loaded from configuration"
-                  .format(self.tcp_server['address'], self.tcp_server['port']))
+                  .format(config['address'], config['port']))
+        return config
+
+
+    def load_node_main(self):
+        config = self._load_cfg_file(self._NODE_MAIN_FILE)
+        return config
 
 
 def main():
