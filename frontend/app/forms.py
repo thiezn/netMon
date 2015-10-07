@@ -1,5 +1,7 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, PasswordField, TextAreaField, BooleanField
+from wtforms import (StringField, PasswordField,
+                     TextAreaField, BooleanField,
+                     IntegerField, SelectField)
 from wtforms.validators import DataRequired, Length, Email, InputRequired
 
 
@@ -28,3 +30,14 @@ class LoginForm(Form):
                              InputRequired("Please provide a password"),
                              Length(min=6, message=(u'Password too short'))])
     remember_me = BooleanField('Remember me', default=False)
+
+
+class TaskForm(Form):
+    name = StringField('name')
+    probe_type = SelectField('Probe Type',
+                             choices=[('PingProbe', 'Ping'),
+                                      ('TraceProbe', 'Trace')])
+    dest_addr = StringField('Destination Address',
+                            validators=[DataRequired('Please provide valid IP')])
+    recurrence_count = IntegerField('How often should this reoccur')
+    recurrence_time = IntegerField('Reoccur every x seconds')

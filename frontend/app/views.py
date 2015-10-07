@@ -1,7 +1,7 @@
 from flask import url_for, session, request, render_template, flash, redirect
 from app import app, db
 from app import hash_string
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, TaskForm
 from .models import User
 from flask.ext.login import login_user, logout_user
 from flask.ext.login import current_user, login_required
@@ -28,6 +28,23 @@ class TaskStorage:
     def get_task(self, task_id):
         """ Returns a single task """
         return self.tasks.find_one({"_id": ObjectId(task_id)})
+
+
+@app.route('/tasks/add', methods=['GET', 'POST'])
+def add_task():
+    """ Add a task to the database """
+    if request.method == 'POST':
+        form = TaskForm(request.form)
+        if form.validate():
+            pass
+
+        return render_template('add_task.html',
+                               form=form,
+                               title="Add Task")
+    else:
+        return render_template('add_task.html',
+                               form=TaskForm(),
+                               title="Add Task")
 
 
 @app.route('/tasks')

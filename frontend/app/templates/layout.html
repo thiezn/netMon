@@ -48,7 +48,8 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-              <li {% if request.path=="/tasks" %} class="active" {% endif %}><a href="{{ url_for('tasks') }}">Tasks</a></l>
+             <li {% if request.path=="/tasks" %} class="active" {% endif %}><a href="{{ url_for('tasks') }}">Tasks</a></li>
+             <li {% if request.path=="/tasks/add" %} class="active" {% endif %}><a href="{{ url_for('add_task') }}">Add Task</a></li>
              <li {% if request.path=="/about" %} class="active" {% endif %}><a href="{{ url_for('about') }}">About</a></li>
 	         <li {% if request.path=="/contact" %} class="active" {% endif %}><a href="{{ url_for('contact') }}">Contact</a></li>
           </ul>
