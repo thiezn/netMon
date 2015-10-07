@@ -24,8 +24,7 @@ def main():
     task_manager.start()
 
     try:
-        task_manager.add(PingProbe('149.210.184.36', recurrence_time=1,
-                                   recurrence_count=5))
+        task_manager.add(PingProbe('149.210.184.36', recurrence_time=1))
         task_manager.add(TraceProbe('8.8.8.8', recurrence_time=3))
         task_manager.add(PingProbe('10.0.0.1'))
         while True:

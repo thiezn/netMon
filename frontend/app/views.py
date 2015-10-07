@@ -70,6 +70,7 @@ def task(task_id):
     if task['type'] == "PingProbe":
         chart = lineChart(name="lineChart",
                           x_is_date=True,
+                          x_axis_format="%d-%m-%y %H:%M:%S",
                           height=250)
         xdata = []
         min_data = []
