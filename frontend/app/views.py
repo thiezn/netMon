@@ -8,6 +8,7 @@ from flask.ext.login import current_user, login_required
 import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from nvd3 import lineChart
 
 
 # Lets get this stuff loaded here quickly,
@@ -64,7 +65,41 @@ def task(task_id):
     task_storage = TaskStorage()
     task = task_storage.get_task(task_id)
 
-    return render_template("task.html", task=task)
+    chart = None
+
+    if task['type'] == "PingProbe":
+        chart = lineChart(name="lineChart",
+                          x_is_date=True,
+                          height=250)
+        xdata = []
+        min_data = []
+        avg_data = []
+        max_data = []
+        for result in task['result']:
+            if 'error' in result:
+                # TODO, need to take into account that some probes
+                # give an error and some don't This just assumes
+                # all probes have errors
+                break
+            # TODO, Convert timestamp to format using function
+            xdata.append(int(result['timestamp'])*1000)
+            min_data.append(result['min'])
+            avg_data.append(result['avg'])
+            max_data.append(result['max'])
+
+        extra_serie = {"tooltip": {"y_start": "There are ", "y_end": " calls"}}
+        chart.add_serie(y=min_data, x=xdata, name='min rtt(ms)',
+                        extra=extra_serie)
+        extra_serie = {"tooltip": {"y_start": "", "y_end": " min"}}
+        chart.add_serie(y=avg_data, x=xdata, name='avg rtt(ms)',
+                        extra=extra_serie)
+        extra_serie = {"tooltip": {"y_start": "", "y_end": " min"}}
+        chart.add_serie(y=max_data, x=xdata, name='max rtt(ms)',
+                        extra=extra_serie)
+        chart.buildcontent()
+        chart = chart.htmlcontent
+
+    return render_template("task.html", task=task, chart=chart)
 
 
 @app.route('/', methods=['GET', 'POST'])

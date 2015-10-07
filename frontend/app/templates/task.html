@@ -9,7 +9,11 @@
 </span>
 <BR><BR>
 
+
 {% if task['type'] == 'PingProbe' %}
+
+{{ chart|safe }}
+<BR><BR>
   <table class="table table-striped">
       <tr>
           <th>timestamp</th>
@@ -30,8 +34,8 @@
   </table>
 {% elif task['type'] == 'TraceProbe' %}
   {% for result in task['result'] %}
-  <span class="small"><b>timestamp</b> {{result['timestamp']}}</span>
   <table class="table table-striped">
+      <caption>Timestamp {{ result['timestamp'] }}</caption>
       <tr>
           <th>hop</th>
           <th>ip address</th>

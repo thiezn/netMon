@@ -4,7 +4,7 @@ from tasks import Task
 import subprocess
 import sys
 import ipaddress
-from datetime import datetime
+
 
 class PingProbe(Task):
     """ Runs an ICMP probe to the provided destination """
@@ -38,7 +38,7 @@ class PingProbe(Task):
                 'type': self.name,
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
-                'run_at': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
+                'run_at': self.run_at,
                 'dest_addr': self.dest_addr,
                 'timeout': self.timeout,
                 'count': self.count,
@@ -80,13 +80,13 @@ class PingProbe(Task):
         if not last_line:
             # if the last line is empty
             # none of the packets arrived
-            self.result = {'timestamp': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
+            self.result = {'timestamp': self.run_at,
                            'error': 'Host unreachable',
                            'packets_sent': second_last_line[0],
                            'packets_recv': second_last_line[3]}
         else:
             last_line = last_line.split()[3].split('/')
-            self.result = {'timestamp': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S'),
+            self.result = {'timestamp': self.run_at,
                            'min': last_line[0],
                            'avg': last_line[1],
                            'max': last_line[2],
