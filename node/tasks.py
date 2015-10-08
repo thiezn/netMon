@@ -75,12 +75,20 @@ class Task:
 class RegisterNode(Task):
     """ Registers a node to the message_handler """
 
+    def __init__(self, node_details):
+        super().__init__()
+        self.node_details = node_details
+
     def run(self, message_handler):
-        message_handler.register()
+        message_handler.register(self.node_details)
 
 
 class UnregisterNode(Task):
     """ Unregisters a node from the message_handler """
 
+    def __init__(self, node_details):
+        super().__init__()
+        self.node_details = node_details
+
     def run(self, message_handler):
-        message_handler.unregister()
+        message_handler.unregister(self.node_details)

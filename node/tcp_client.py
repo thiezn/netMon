@@ -21,7 +21,7 @@ class MessageHandler:
         self.controller_port = controller_port
         self.is_connected = False
 
-    def register(self):
+    def register(self, node_details):
         """ Registers to the controller """
 
         logger.info("Registering to controller {}:{}"
@@ -30,7 +30,9 @@ class MessageHandler:
                                            self.controller_port)
         self.is_connected = True
         message = {'type': 'register',
-                   'version': '0.1',
+                   'name': node_details['name'],
+                   'version': node_details['version'],
+                   'group': node_details['group'],
                    'ip_addr': ['127.0.0.1'],
                    'mac': 'aa:bb:cc:dd:ee:ff',
                    'last_registered': None,
@@ -38,12 +40,13 @@ class MessageHandler:
                    'shared_key': 'public'}
         self.protocol.send_message(message)
 
-    def unregister(self):
+    def unregister(self, node_details):
         """ Unregisters from the controller """
 
         logger.info("Unregistering from controller {}:{}"
                     .format(self.controller_addr, self.controller_port))
-        message = {'type': 'unregister'}
+        message = {'type': 'unregister',
+                   'name': node_details['name']}
         self.protocol.send_message(message)
         self.protocol.close()
         self.is_connected = False

@@ -10,7 +10,7 @@ class Configuration:
 
     _BASE_DIR = "cfg/"
     _TCP_SERVER_FILE = "tcp_server.cfg"
-    _NODE_MAIN_FILE = "node-main.cfg"
+    _NODE_MAIN_FILE = "node_main.cfg"
 
     def _load_cfg_file(self, filename):
         """ Open configuration files """
@@ -40,7 +40,9 @@ class Configuration:
 
 
 def main():
-    pass
+    config = Configuration()
+    print(config.load_tcp_server())
+    print(config.load_node_main())
 
 if __name__ == '__main__':
     main()

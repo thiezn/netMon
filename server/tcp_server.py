@@ -107,33 +107,37 @@ class MessageHandler:
         """ Call this function to update the terminal window output """
         print("Connected nodes: {}         ".format(len(self.nodes)), end='\r')
 
-    def register(self, node, msg):
+    def register(self, peername, msg):
         """ Registers a node to the controller
 
         Only accepting connection if software versions match """
 
         if self.version != msg['version']:
             logging.debug("Registration of node {} denied due to "
-                          "version mismatch".format(node))
+                          "version mismatch".format(peername))
             return {'type': 'register', 'error': 'VERSION_MISMATCH'}
 
+        node = {}
+        node['peername'] = peername
+        node['name'] = msg['name']
+        node['version'] = msg['version']
+        node['group'] = msg['group']
         self.nodes.append(node)
         logging.info('Client {} wants to register'.format(node))
         logging.info('Client sent the following: {}'.format(msg))
         logging.debug('Connected nodes are now {}'.format(self.nodes))
         self._update_console()
 
-    def unregister(self, node, msg=None):
+    def unregister(self, peername, msg=None):
         """ Unregisters a node from the controller """
 
-        try:
-            self.nodes.remove(node)
-            logging.info('Unregistering client {}, reason {}'
+        for node in self.nodes:
+            if node['peername'] == peername:
+                self.nodes.remove(node)
+                logging.info('Unregistering client {}, reason {}'
                          .format(node, msg))
-            logging.info('Connected nodes: {}'.format(self.nodes))
-        except ValueError:
-            # node not in list. probably already unregistered
-            pass
+                logging.info('Connected nodes: {}'.format(self.nodes))
+                break
 
         self._update_console()
 

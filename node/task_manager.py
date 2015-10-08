@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from config_manager import Configuration
 from threading import Thread
 from tcp_client import MessageHandler
 import queue
@@ -15,6 +16,9 @@ class TaskManager:
 
     def __init__(self):
         """ Initialising the task_queue and task_result_queue """
+        config = Configuration()
+        self.node_details = config.load_node_main()
+
         self._task_queue = queue.Queue()
         self._task_result_queue = queue.Queue()
         self.message_handler = MessageHandler('127.0.0.1', 10666)
@@ -49,7 +53,7 @@ class TaskManager:
 
         logger.info('Stopping task manager...')
         # unregister us from the message_handler
-        self.add(UnregisterNode())
+        self.add(UnregisterNode(self.node_details))
 
     def add(self, task):
         """ Adds a new task to the queue """
@@ -70,7 +74,7 @@ class TaskManager:
 
         if not self.message_handler.is_connected:
             # Register to the controller
-            self.add(RegisterNode())
+            self.add(RegisterNode(self.node_details))
 
         while True:
             # First lets handle all the queued tasks
