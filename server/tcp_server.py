@@ -125,7 +125,16 @@ class MessageHandler:
         node['version'] = msg['version']
         node['group'] = msg['group']
         node['is_connected'] = True
-        node['_id'] = self.node_storage.add(node)
+
+        node_in_db = self.node_storage.get_node_by_name(node['name'])
+        if node_in_db:
+            # Update any potential changed parameters in db
+            node['_id'] = node_in_db['_id']
+            self.node_storage.replace(node)  # updates any changed data
+        else:
+            # This is a unknown node, lets store it in db
+            node['_id'] = self.node_storage.add(node)
+
         self.nodes.append(node)
         logging.info('Node {} wants to register'.format(node))
         logging.info('Node {} sent the following: {}'.format(node, msg))

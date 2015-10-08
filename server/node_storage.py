@@ -44,9 +44,13 @@ class NodeStorage:
         for item in self.nodes.find():
             print(item)
 
-    def get_node(self, node_id):
+    def get_node_by_id(self, node_id):
         """ Returns a single node """
-        print(self.nodes.find_one({"_id": ObjectId(node_id)}))
+        return self.nodes.find_one({"_id": ObjectId(node_id)})
+
+    def get_node_by_name(self, node_name):
+        """ Returns a single node, querying by name """
+        return self.nodes.find_one({"name": node_name})
 
 
 if __name__ == '__main__':
