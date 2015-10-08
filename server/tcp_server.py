@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+from node_storage import NodeStorage
 
 
 class ConnectionProtocol(asyncio.Protocol):
@@ -102,6 +103,7 @@ class MessageHandler:
         self.name = name
         self.nodes = []
         self.version = '0.1'
+        self.node_storage = NodeStorage()
 
     def _update_console(self):
         """ Call this function to update the terminal window output """
@@ -122,9 +124,11 @@ class MessageHandler:
         node['name'] = msg['name']
         node['version'] = msg['version']
         node['group'] = msg['group']
+        node['is_connected'] = True
+        node['_id'] = self.node_storage.add(node)
         self.nodes.append(node)
-        logging.info('Client {} wants to register'.format(node))
-        logging.info('Client sent the following: {}'.format(msg))
+        logging.info('Node {} wants to register'.format(node))
+        logging.info('Node {} sent the following: {}'.format(node, msg))
         logging.debug('Connected nodes are now {}'.format(self.nodes))
         self._update_console()
 
@@ -133,9 +137,11 @@ class MessageHandler:
 
         for node in self.nodes:
             if node['peername'] == peername:
+                node['is_connected'] = False
+                self.node_storage.replace(node)
                 self.nodes.remove(node)
                 logging.info('Unregistering client {}, reason {}'
-                         .format(node, msg))
+                             .format(node, msg))
                 logging.info('Connected nodes: {}'.format(self.nodes))
                 break
 
