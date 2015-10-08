@@ -2,21 +2,28 @@
 {% block content %}
 
 <div class="row">
+    {% for node in nodes %}
   <div class="col-sm-3">
-  <!-- User profile of {{ user.name }} -->
     <div class="panel panel-default">
         <div class="panel-body">
             <img class="img-rounded pull-left" style="margin-right: 10px;" src="http://placehold.it/96x96.jpg">
             <br>
-            <h4>{{ user.name }}</h4>
+            <h4>{{ node.name }}</h4>
+            <p><b>version</b> {{ node.version }}<br>
+            <b>group</b> {{node.group}}</p>
         </div>
         <div class="panel-footer">
             <small>
-               member since {{user.datecreated}}
+                {% if node.is_connected %}
+                <span class='label label-success'>connected</span>
+                {% else %}
+                <span class='label label-danger'>not connected</span>
+                {% endif %}
             </small>
         </div>
     </div>
   </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

@@ -9,12 +9,16 @@ import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from nvd3 import lineChart
+from datetime import datetime
 
 
 # Lets get this stuff loaded here quickly,
 # need to do a LOT of cleanup on the whole frontend
 # code as I was just a newbie when i wrote this stuff
 # now i'm at least an intermediate newbie at python :)
+# also need to merge the Task and NodeStorage classes
+# so we don't have to setup two DB connections
+
 class TaskStorage:
     def __init__(self, db_addr='127.0.0.1', db_port=27017):
         self.session = MongoClient(db_addr, db_port)
@@ -29,6 +33,29 @@ class TaskStorage:
     def get_task(self, task_id):
         """ Returns a single task """
         return self.tasks.find_one({"_id": ObjectId(task_id)})
+
+
+class NodeStorage:
+    def __init__(self, db_addr='127.0.0.1', db_port=27017):
+        self.session = MongoClient(db_addr, db_port)
+        self.db = self.session.node_database
+        self.nodes = self.db.node_collection
+        self.node_ids = []
+
+    def get_nodes(self):
+        """ return out all nodes """
+        return self.nodes.find()
+
+    def get_node_by_id(self, node_id):
+        """ Returns a single node by ID """
+        return self.node.find_one({"_id": ObjectId(node_id)})
+
+
+# Use a global variable for Task/NodeStorage, otherwise we need
+# to setup a new connection to mongodb for each function
+
+task_storage = TaskStorage()
+node_storage = NodeStorage()
 
 
 @app.route('/tasks/add', methods=['GET', 'POST'])
@@ -50,7 +77,6 @@ def add_task():
 
 @app.route('/tasks')
 def tasks():
-    task_storage = TaskStorage()
     result = task_storage.get_tasks()
 
     tasks = []
@@ -62,7 +88,6 @@ def tasks():
 
 @app.route('/task/<task_id>')
 def task(task_id):
-    task_storage = TaskStorage()
     task = task_storage.get_task(task_id)
 
     chart = None
@@ -100,6 +125,11 @@ def task(task_id):
         chart.buildcontent()
         chart = chart.htmlcontent
 
+    # convert timestamps for pretty printing
+    for item in task['result']:
+        item['timestamp'] = format(datetime.fromtimestamp(item['timestamp']),
+                                   '%d-%b-%y - %H:%M:%S')
+
     return render_template("task.html", task=task, chart=chart)
 
 
@@ -109,12 +139,11 @@ def home():
 
     # Check if the user is logged on already
     if current_user.is_authenticated:
-        user = User.query.filter_by(id=session['id']).first()
+        nodes = node_storage.get_nodes()
 
-        # The form either didn't validate or there was no POST request
         return render_template('home.html',
                                title='Home',
-                               user=user)
+                               nodes=nodes)
     else:
         # We're not logged on so point us to the logon/registration page
         return render_template('firstvisit.html',

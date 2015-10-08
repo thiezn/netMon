@@ -101,8 +101,8 @@ class TraceProbe(Task):
         stdout, stderr = trace.communicate()
 
         # Parse the traceroute result
-        hop = 1
-        self.result = {'timestamp': self.run_at}
+        self.result = {'timestamp': self.run_at,
+                       'hops': []}
 
         if stderr:
             self.result['error'] = stderr
@@ -114,11 +114,9 @@ class TraceProbe(Task):
             rtt = self.extract_rtt_from_line(line)
             if(ip_address and not line.startswith("traceroute to") and
                not line.startswith("Tracing")):
-                self.result['%d' % hop] = {'ip_address': ip_address,
-                                           'rtt': rtt}
-                hop += 1
+                self.result['hops'].append({'ip_address': ip_address,
+                                              'rtt': rtt})
             elif '*' in line:
-                self.result['%d' % hop] = {'ip_address': '*'}
-                hop += 1
+                self.result['hops'].append({'ip_address': '*'})
 
         return True

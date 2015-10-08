@@ -39,6 +39,7 @@ class TaskStorage:
         """
         logger.info('updating task_id {} with result {}'
                     .format(task.task_id, task))
+
         self.tasks.update_one({'_id': task.task_id},
                               {'$addToSet': {'result': task.result}},
                               upsert=upsert)
@@ -55,4 +56,4 @@ class TaskStorage:
 
 if __name__ == '__main__':
     task_storage = TaskStorage()
-    task_storage.get_task('56141fabc2aef51205787ecb')
+    task_storage.get_tasks()
