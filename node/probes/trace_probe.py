@@ -7,7 +7,6 @@
 # v0.1 2-10-2015 - Initial version created based on trace script for infoblox
 
 import subprocess       # For calling external shell commands
-import re               # used for regular expression matching
 from tasks import Task
 import ipaddress
 
@@ -39,22 +38,15 @@ class TraceProbe(Task):
             return None
 
     def extract_ip_from_line(self, line):
-        """ Check a string line to see if there's an valid IP address
+        """ Check a string line to see if there's an valid IP address """
 
-        TODO: Check if we can replace this with the ipaddress module from
-        python 3?
-        """
-        ip = re.compile('(([2][5][0-5]\.)|'
-                        '([2][0-4][0-9]\.)|'
-                        '([0-1]?[0-9]?[0-9]\.)){3}'
-                        '(([2][5][0-5])|([2][0-4][0-9])|'
-                        '([0-1]?[0-9]?[0-9]))')
-        match = ip.search(line)
-
-        if match:
-            return match.group()
-        else:
-            return None
+        ip = line.split()[1]
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            if ip != "*":
+                return None
+        return ip
 
     def db_record(self):
         """ Should return what we want to write to the
