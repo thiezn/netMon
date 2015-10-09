@@ -74,7 +74,7 @@ class TaskManager:
 
         if not self.message_handler.is_connected:
             # Register to the controller
-            self.add(RegisterNode(self.node_details))
+            self.add(RegisterNode(self.node_details, message_handler=self.message_handler))
 
         while True:
             # First lets handle all the queued tasks
@@ -87,20 +87,13 @@ class TaskManager:
 
                     if(current_task.name == 'UnregisterNode'):
                         # Quit the task_manager when this is handled
-                        current_task.run(self.message_handler)
+                        current_task.run(message_handler=message_handler)
                         logging.info('Task manager stopped')
                         break
 
-                    if current_task.is_remote:
-                        # Task needs to communicate with the server
-                        result = current_task.run(self.message_handler)
-                        if result:
-                            self._task_result_queue.put(current_task)
-                    else:
-                        # Task runs locally on Node
-                        result = current_task.run()
-                        if result:
-                            self._task_result_queue.put(current_task)
+                    result = current_task.run()
+                    if result:
+                        self._task_result_queue.put(current_task)
 
                     if current_task.reschedule():
                         # reschedule the task if needed

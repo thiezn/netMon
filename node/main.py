@@ -2,7 +2,6 @@
 
 import logging
 from task_manager import TaskManager
-from config_manager import Configuration
 from probes.trace_probe import TraceProbe
 from probes.ping_probe import PingProbe
 from task_storage import TaskStorage

@@ -3,6 +3,7 @@
 import time
 from datetime import datetime
 
+
 class Task:
     """ Class describing a Task for use in the TaskManager
 
@@ -12,17 +13,21 @@ class Task:
         recurrence_count: how often should the task re-occur
     """
 
-    def __init__(self, run_at="now", is_remote=True,
-                 recurrence_time=None, recurrence_count=None):
+    def __init__(self, **kwargs):
         """ Define the task name, set the run at time and define
          recurrence if any
 
-        Args:
+        kwargs:
             run_at: when should the task run, use "now" for a immediate task
             recurrence_time: after how many seconds should the task reoccur
             recurrence_count: how often should the task reoccur
-            is_remote: Set to True if it needs to communicate to the tcp_server
         """
+
+        run_at = kwargs.get('run_at', "now")
+        recurrence_time = kwargs.get('recurrence_time', None)
+        recurrence_count = kwargs.get('recurrence_count', None)
+        self.message_handler = kwargs.get('message_handler', None)
+
         if recurrence_count and not recurrence_time:
             raise ValueError('Have to provide recurrence_time when '
                              'providing recurrence_count')
@@ -35,7 +40,6 @@ class Task:
         self.name = self.__class__.__name__
         self.recurrence_time = recurrence_time
         self.recurrence_count = recurrence_count
-        self.is_remote = is_remote
         self.task_id = None
 
     def db_record(self):
@@ -75,20 +79,20 @@ class Task:
 class RegisterNode(Task):
     """ Registers a node to the message_handler """
 
-    def __init__(self, node_details):
-        super().__init__()
+    def __init__(self, node_details, **kwargs):
+        super().__init__(**kwargs)
         self.node_details = node_details
 
-    def run(self, message_handler):
-        message_handler.register(self.node_details)
+    def run(self):
+        self.message_handler.register(self.node_details)
 
 
 class UnregisterNode(Task):
     """ Unregisters a node from the message_handler """
 
-    def __init__(self, node_details):
-        super().__init__()
+    def __init__(self, node_details, **kwargs):
+        super().__init__(**kwargs)
         self.node_details = node_details
 
-    def run(self, message_handler):
-        message_handler.unregister(self.node_details)
+    def run(self):
+        self.message_handler.unregister(self.node_details)
