@@ -2,6 +2,7 @@
 {% block content %}
 
 <div class="row">
+    <form action="" method="post" name="buttons">
     {% for node in nodes %}
   <div class="col-sm-3">
     <div class="panel panel-default">
@@ -17,13 +18,15 @@
                 {% if node.is_connected %}
                 <span class='label label-success'>connected</span>
                 {% else %}
-                <span class='label label-danger'>not connected</span>
+                <span class='label label-warning'>not connected</span>
                 {% endif %}
             </small>
+            <button type="submit" class="pull-right btn btn-danger btn-xs" name="delete" value="{{node.name}}">delete</button>
         </div>
     </div>
   </div>
     {% endfor %}
+</form>
 </div>
 
 {% endblock %}

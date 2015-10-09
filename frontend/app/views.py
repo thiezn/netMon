@@ -42,13 +42,35 @@ class NodeStorage:
         self.nodes = self.db.node_collection
         self.node_ids = []
 
+    def clear_db(self):
+        """ clears out all db entries """
+        self.session.drop_database('node_database')
+
     def get_nodes(self):
         """ return out all nodes """
         return self.nodes.find()
 
     def get_node_by_id(self, node_id):
         """ Returns a single node by ID """
-        return self.node.find_one({"_id": ObjectId(node_id)})
+        return self.nodes.find_one({"_id": ObjectId(node_id)})
+
+    def delete_node_by_id(self, node_id):
+        """ Removes a single node from the db by ID
+
+        TODO: the remove function returns a WriteResult object.
+        Need to build in a check to see if it was removed
+        succesfully or not
+        """
+        self.nodes.remove({"_id": ObjectId(node_id)})
+
+    def delete_node_by_name(self, node_name):
+        """ Removes a single node from the db by ID
+
+        TODO: the remove function returns a WriteResult object.
+        Need to build in a check to see if it was removed
+        succesfully or not
+        """
+        self.nodes.remove({"name": node_name})
 
 
 # Use a global variable for Task/NodeStorage, otherwise we need
@@ -141,9 +163,15 @@ def home():
     if current_user.is_authenticated:
         nodes = node_storage.get_nodes()
 
+        if request.method == 'POST':
+            if request.form['delete']:
+                # Request.form['delete'] will carry the node_name
+                node_storage.delete_node_by_name(request.form['delete'])
+
         return render_template('home.html',
                                title='Home',
-                               nodes=nodes)
+                               nodes=nodes,
+                               form=request.form)
     else:
         # We're not logged on so point us to the logon/registration page
         return render_template('firstvisit.html',
