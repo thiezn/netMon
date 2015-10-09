@@ -2,7 +2,6 @@
 
 from tasks import Task
 import subprocess
-import sys
 import ipaddress
 
 
@@ -50,15 +49,10 @@ class PingProbe(Task):
             True: Returns true if the probe was succesful
         """
 
-        if sys.platform.startswith('linux'):
-            parameters = ["ping", self.dest_addr,
-                          "-c " + self.count,
-                          "-l " + self.preload,
-                          "-W " + self.timeout]
-        else:
-            # In the future perhaps build in support for windows and macos
-            # ping support. For now just return None
-            return False
+        parameters = ["ping", self.dest_addr,
+                      "-c " + self.count,
+                      "-l " + self.preload,
+                      "-W " + self.timeout]
 
         trace = subprocess.Popen(parameters,
                                  stdout=subprocess.PIPE,

@@ -6,7 +6,6 @@
 #
 # v0.1 2-10-2015 - Initial version created based on trace script for infoblox
 
-import sys
 import subprocess       # For calling external shell commands
 import re               # used for regular expression matching
 from tasks import Task
@@ -73,22 +72,15 @@ class TraceProbe(Task):
         """ This command runs a traceroute and returns
         the results """
 
-        if sys.platform.startswith('linux'):
-            if self.icmp:
-                # Use TCP traceroute to be able to traverse firewall
-                parameters = ["sudo", "traceroute", "-I", "-n",
-                              "-w " + self.wait_time, "-m " + self.max_hops,
-                              "-n", "-q 1", self.dest_addr]
-            else:
-                # normal udp based traceroute
-                parameters = ["traceroute", "-n", "-w " + self.wait_time,
-                              "-m " + self.max_hops, "-n", "-q 1",
-                              self.dest_addr]
+        if self.icmp:
+            # Use TCP traceroute to be able to traverse firewall
+            parameters = ["sudo", "traceroute", "-I", "-n",
+                          "-w " + self.wait_time, "-m " + self.max_hops,
+                          "-n", "-q 1", self.dest_addr]
         else:
-            # assume we're on windows.. Yes I know, maybe
-            # someday we'll introduce MacOS support :)
-            parameters = ["C:\Windows\System32\\tracert.exe", "-d",
-                          "-w", self.wait_time, '-h', self.max_hops,
+            # normal udp based traceroute
+            parameters = ["traceroute", "-n", "-w " + self.wait_time,
+                          "-m " + self.max_hops, "-n", "-q 1",
                           self.dest_addr]
 
         trace = subprocess.Popen(parameters,
@@ -104,14 +96,17 @@ class TraceProbe(Task):
             self.result['error'] = stderr
             return True
 
-        for line in stdout.splitlines():
+        lines = stdout.splitlines()
+        # remove first line "traceroute to..."
+        del lines[0]
+
+        for line in lines:
             line = line.decode('utf-8')
             ip_address = self.extract_ip_from_line(line)
             rtt = self.extract_rtt_from_line(line)
-            if(ip_address and not line.startswith("traceroute to") and
-               not line.startswith("Tracing")):
+            if(ip_address):
                 self.result['hops'].append({'ip_address': ip_address,
-                                              'rtt': rtt})
+                                            'rtt': rtt})
             elif '*' in line:
                 self.result['hops'].append({'ip_address': '*'})
 
