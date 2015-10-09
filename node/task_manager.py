@@ -74,7 +74,10 @@ class TaskManager:
 
         if not self.message_handler.is_connected:
             # Register to the controller
-            self.add(RegisterNode(self.node_details, self.message_handler))
+            # note we don not register this task to the task_manager
+            # as we don't want to process messages until the
+            # connection is established
+            RegisterNode(self.node_details, self.message_handler).run()
 
         while True:
             # First lets handle all the queued tasks
@@ -103,6 +106,8 @@ class TaskManager:
 
             # Now lets see if there are any messages received
             # from the controller.
+            # Nothing happens here yet but we could for instance
+            # accept new scheduled tasks from the frontend/controller
             # TODO: I guess a lot of this logic should go into the
             # message_handler class instead of accessing the protocol
             # directly
