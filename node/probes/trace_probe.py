@@ -16,7 +16,7 @@ import ipaddress
 class TraceProbe(Task):
 
     def __init__(self, dest_addr, wait_time='1', max_hops='20',
-                 icmp=True, **kwargs):
+                 icmp=True, *args, **kwargs):
         """ initialize  Task scheduling and traceroute options """
         super().__init__(**kwargs)
         self.dest_addr = dest_addr

@@ -10,7 +10,7 @@ class PingProbe(Task):
     """ Runs an ICMP probe to the provided destination """
 
     def __init__(self, dest_addr, count='10', preload='10',
-                 timeout='1', **kwargs):
+                 timeout='1', *args, **kwargs):
         """ Making sure to pass on the scheduling variables to the
         main task.
 
@@ -20,7 +20,7 @@ class PingProbe(Task):
             timeout: amount of seconds before a probe times out
         """
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
         self.dest_addr = dest_addr
         ipaddress.ip_address(dest_addr)  # Check if we have valid ip
         self.count = count

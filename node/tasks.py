@@ -13,7 +13,7 @@ class Task:
         recurrence_count: how often should the task re-occur
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """ Define the task name, set the run at time and define
          recurrence if any
 
@@ -26,7 +26,6 @@ class Task:
         run_at = kwargs.get('run_at', "now")
         recurrence_time = kwargs.get('recurrence_time', None)
         recurrence_count = kwargs.get('recurrence_count', None)
-        self.message_handler = kwargs.get('message_handler', None)
 
         if recurrence_count and not recurrence_time:
             raise ValueError('Have to provide recurrence_time when '
@@ -76,22 +75,30 @@ class Task:
         raise NotImplementedError
 
 
-class RegisterNode(Task):
+class RemoteTask(Task):
+    """ Task that need to communicate through the message_handler """
+
+    def __init__(self, message_handler, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.message_handler = message_handler
+
+
+class RegisterNode(RemoteTask):
     """ Registers a node to the message_handler """
 
-    def __init__(self, node_details, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, node_details, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.node_details = node_details
 
     def run(self):
         self.message_handler.register(self.node_details)
 
 
-class UnregisterNode(Task):
+class UnregisterNode(RemoteTask):
     """ Unregisters a node from the message_handler """
 
-    def __init__(self, node_details, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, node_details, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.node_details = node_details
 
     def run(self):
