@@ -1,7 +1,8 @@
 from flask.ext.wtf import Form
 from wtforms import (StringField, PasswordField,
                      TextAreaField, BooleanField,
-                     IntegerField, SelectField)
+                     IntegerField, SelectField,
+                     DateTimeField)
 from wtforms.validators import DataRequired, Length, Email, InputRequired
 
 
@@ -34,10 +35,11 @@ class LoginForm(Form):
 
 class TaskForm(Form):
     name = StringField('name')
-    probe_type = SelectField('Probe Type',
+    probe_type = SelectField('Probe Type', default='PingProbe',
                              choices=[('PingProbe', 'Ping'),
                                       ('TraceProbe', 'Trace')])
     dest_addr = StringField('Destination Address',
-                            validators=[DataRequired('Please provide valid IP')])
+                            validators=[DataRequired('Invalid IP')])
+    run_at = DateTimeField('Run at')
     recurrence_count = IntegerField('How often should this reoccur')
     recurrence_time = IntegerField('Reoccur every x seconds')

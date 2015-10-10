@@ -26,6 +26,16 @@ class TaskStorage:
         self.tasks = self.db.task_collection
         self.task_ids = []
 
+    def add(self, task):
+        """ Adds a task Task to the database
+
+        Args:
+            task: A dict representing a task object
+        return:
+            task_id: _id value of mongodb document
+        """
+        return self.tasks.insert_one(task).inserted_id
+
     def get_tasks(self):
         """ Prints out all tasks """
         return self.tasks.find()
@@ -82,15 +92,51 @@ node_storage = NodeStorage()
 
 @app.route('/tasks/add', methods=['GET', 'POST'])
 def add_task():
-    """ Add a task to the database """
+    """ Add a task to the database
+
+    PingProbe can have the following values:
+                'type'
+                'recurrence_time'
+                'recurrence_count'
+                'run_at'
+                'dest_addr'
+                'timeout'
+                'count'
+                'preload'
+
+    TraceProbe can have the following values:
+                'type'
+                'recurrence_time'
+                'recurrence_count'
+                'run_at'
+                'dest_addr'
+                'wait_time'
+                'max_hops'
+    """
     if request.method == 'POST':
         form = TaskForm(request.form)
         if form.validate():
-            pass
+            task = {'type': form.data['probe_type'],
+                    'recurrence_time': form.recurrence_time.data,
+                    'recurrence_count': form.recurrence_count.data,
+                    'run_at': form.run_at.data,
+                    'dest_addr': form.dest_addr.data}
+            if form.probe_type == 'PingProbe':
+                task['timeout'] = 1
+                task['count'] = 10
+                task['preload'] = 10
+            elif form.probe_type == 'TraceProbe':
+                task['wait_time'] = 1
+                task['max_hops'] = 20
 
+            task['_id'] = task_storage.add(task)
+            return render_template('task_added.html',
+                                   form=form,
+                                   title="Task added",
+                                   task=task)
         return render_template('add_task.html',
                                form=form,
-                               title="Add Task")
+                               title='Task added')
     else:
         return render_template('add_task.html',
                                form=TaskForm(),
