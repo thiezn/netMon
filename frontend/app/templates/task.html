@@ -18,6 +18,7 @@
           <th>max</th>
           <th>error</th>
       </tr>
+{% if 'result' in task %}
   {% for result in task['result'] %}
      <tr>
          <td>{{result['timestamp']}}</td>
@@ -28,6 +29,10 @@
      </tr>
   {% endfor %}
   </table>
+{% else %}
+  </table>
+  No results yet
+{% endif %}
 
 {% elif task['type'] == 'TraceProbe' %}
 

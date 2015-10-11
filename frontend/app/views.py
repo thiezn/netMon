@@ -160,7 +160,8 @@ def task(task_id):
 
     chart = None
 
-    if task['type'] == "PingProbe":
+    if(task['type'] == "PingProbe" and
+       'result' in task):
         chart = lineChart(name="lineChart",
                           x_is_date=True,
                           x_axis_format="%d-%m-%y %H:%M:%S",
@@ -193,10 +194,10 @@ def task(task_id):
         chart.buildcontent()
         chart = chart.htmlcontent
 
-    # convert timestamps for pretty printing
-    for item in task['result']:
-        item['timestamp'] = format(datetime.fromtimestamp(item['timestamp']),
-                                   '%d-%b-%y - %H:%M:%S')
+        # convert timestamps for pretty printing
+        for item in task['result']:
+            item['timestamp'] = format(datetime.fromtimestamp(item['timestamp']),
+                                       '%d-%b-%y - %H:%M:%S')
 
     return render_template("task.html", task=task, chart=chart)
 

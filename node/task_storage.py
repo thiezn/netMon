@@ -45,9 +45,8 @@ class TaskStorage:
                               upsert=upsert)
 
     def get_tasks(self):
-        """ Prints out all tasks """
-        for item in self.tasks.find():
-            print(item)
+        """ retrieve all tasks """
+        return self.tasks.find()
 
     def get_task(self, task_id):
         """ Returns a single task """

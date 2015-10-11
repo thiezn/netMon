@@ -5,7 +5,7 @@ from task_manager import TaskManager
 from probes.trace_probe import TraceProbe
 from probes.ping_probe import PingProbe
 from task_storage import TaskStorage
-
+import time
 
 def main():
     logging.basicConfig(filename='log.main',
@@ -28,7 +28,17 @@ def main():
         while True:
             # Here we can send probes to the task_manager
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
-            pass
+            db_tasks = task_storage.get_tasks()
+            for task in db_tasks:
+                if task['type'] == 'PingProbe':
+                    task_manager.add(PingProbe(task['dest_addr'],
+                                     recurrence_time=task['recurrence_time'],
+                                     recurrence_count=task['recurrence_count']))
+                if task['type'] == 'TraceProbe':
+                    task_manager.add(TraceProbe(task['dest_addr'],
+                                     recurrence_time=task['recurrence_time'],
+                                     recurrence_count=task['recurrence_count']))
+            time.sleep(5)
     except KeyboardInterrupt:
         task_manager.stop()
         print("\nThanks for joining!\n")
