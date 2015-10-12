@@ -9,6 +9,8 @@
     <th>first run</th>
     <th>recurrence</th>
     <th>recurrence time (sec)</th>
+    <th>run on nodes</th>
+    <th>run on groups</th>
   </tr>
 {% for task in tasks %}
   <tr>
@@ -25,6 +27,8 @@
         <td>{{task['recurrence_count']}}</td>
         <td>{{task['recurrence_time']}}</td>
       {% endif %}
+          <td>{{task['run_on_nodes']|join(' ,')}}</td>
+          <td>{{task['run_on_groups']|join(' ,')}}</td>
   </tr>
 {% endfor %}
 </table>

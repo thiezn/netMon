@@ -7,6 +7,7 @@ from probes.ping_probe import PingProbe
 from task_storage import TaskStorage
 import time
 
+
 def main():
     logging.basicConfig(filename='log.main',
                         level=logging.DEBUG,
@@ -22,27 +23,30 @@ def main():
     task_manager.start()
 
     try:
-        task_manager.add(PingProbe('149.210.184.36', recurrence_time=1))
-        task_manager.add(TraceProbe('8.8.8.8', recurrence_time=3))
-        task_manager.add(PingProbe('10.0.0.1'))
+        task_manager.add(PingProbe('149.210.184.36',
+                                   recurrence_time=1,
+                                   run_on_nodes=['trucks']))
+        task_manager.add(TraceProbe('8.8.8.8',
+                                    recurrence_time=3))
+        task_manager.add(PingProbe('10.0.0.1',
+                                   run_on_nodes=['miles']))
         while True:
             # Here we can send probes to the task_manager
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
             db_tasks = task_storage.get_tasks()
             for task in db_tasks:
-                if task['type'] == 'PingProbe':
-                    task_manager.add(PingProbe(task['dest_addr'],
-                                     recurrence_time=task['recurrence_time'],
-                                     recurrence_count=task['recurrence_count']))
-                if task['type'] == 'TraceProbe':
-                    task_manager.add(TraceProbe(task['dest_addr'],
-                                     recurrence_time=task['recurrence_time'],
-                                     recurrence_count=task['recurrence_count']))
+                if 'trucks' in task['run_on_nodes']:
+                    if task['type'] == 'PingProbe':
+                        task_manager.add(PingProbe(task['dest_addr'],
+                                         recurrence_time=task['recurrence_time'],
+                                         recurrence_count=task['recurrence_count']))
+                    if task['type'] == 'TraceProbe':
+                        task_manager.add(TraceProbe(task['dest_addr'],
+                                         recurrence_time=task['recurrence_time'],
+                                         recurrence_count=task['recurrence_count']))
             time.sleep(5)
     except KeyboardInterrupt:
         task_manager.stop()
         print("\nThanks for joining!\n")
-        print("here are all current tasks in db")
-        task_storage.get_tasks()
 if __name__ == '__main__':
     main()

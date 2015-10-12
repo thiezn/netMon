@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import time
-from datetime import datetime
 
 
 class Task:
@@ -23,15 +22,17 @@ class Task:
             recurrence_count: how often should the task reoccur
         """
 
-        run_at = kwargs.get('run_at', "now")
+        run_at = kwargs.get('run_at', None)
         recurrence_time = kwargs.get('recurrence_time', None)
         recurrence_count = kwargs.get('recurrence_count', None)
+        self.run_on_nodes = kwargs.get('run_on_nodes', [])
+        self.run_on_groups = kwargs.get('run_on_groups', [])
 
         if recurrence_count and not recurrence_time:
-            raise ValueError('Have to provide recurrence_time when '
+            raise ValueError('Can\'t create recurring task without '
                              'providing recurrence_count')
 
-        if run_at == "now":
+        if not run_at:
             self.run_at = time.time()
         else:
             self.run_at = run_at
@@ -47,7 +48,9 @@ class Task:
         return {'type': self.name,
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
-                'run_at': datetime.fromtimestamp(int(self.run_at)).strftime('%Y-%m-%d %H:%M:%S')}
+                'run_at': self.run_at,
+                'run_on_nodes': self.run_on_nodes,
+                'run_on_groups': self.run_on_groups}
 
     def reschedule(self):
         """ Check if the Task has to reoccur again

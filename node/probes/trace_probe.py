@@ -56,6 +56,8 @@ class TraceProbe(Task):
                 'recurrence_time': self.recurrence_time,
                 'recurrence_count': self.recurrence_count,
                 'run_at': self.run_at,
+                'run_on_nodes': self.run_on_nodes,
+                'run_on_groups': self.run_on_groups,
                 'dest_addr': self.dest_addr,
                 'wait_time': self.wait_time,
                 'max_hops': self.max_hops}
