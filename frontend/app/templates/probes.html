@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<table class="table table-striped">
+  <tr>
+    <th>probe_id</th>
+    <th>type</th>
+    <th>destination</th>
+    <th>first run</th>
+    <th>recurrence</th>
+    <th>recurrence time (sec)</th>
+    <th>run on nodes</th>
+    <th>run on groups</th>
+  </tr>
+{% for probe in probes %}
+  <tr>
+      <td><a href='{{ url_for('probe', probe_id=probe['_id']) }}'>{{probe['_id']}}</a></td>
+      <td>{{probe['type']}}</td>
+      <td>{{probe['dest_addr']}}</td>
+      <td>{{probe['run_at']}}</td>
+      {% if probe['recurrence_time'] and not probe['recurrence_count'] %}
+        <td>persistent</td>
+        <td>{{probe['recurrence_time']}}</td>
+      {% elif not probe['recurrence_time'] and not probe['recurrence_time'] %}
+        <td>one-off probe</td>
+        <td></td>
+      {% else %} 
+        <td>{{probe['recurrence_count']}}</td>
+        <td>{{probe['recurrence_time']}}</td>
+      {% endif %}
+          <td>{{probe['run_on_nodes']|join(' ,')}}</td>
+          <td>{{probe['run_on_groups']|join(' ,')}}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

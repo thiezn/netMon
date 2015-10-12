@@ -17,8 +17,9 @@ def main():
     logging.info('Loading poller...')
     poller = Poller('trucks')
 
-    logging.info('Setting up task storage db...')
+    logging.info('Setting up probe storage db...')
     probe_storage = ProbeStorage()
+    probe_storage.clear_db()
 
     poller.start()
 
@@ -33,18 +34,20 @@ def main():
             # Here we can send probes to the poller
             # e.g. poller.add(IcmpProbe('127.0.0.1'))
             db_probes = probe_storage.get_probes()
-            for task in db_probes:
-                if 'trucks' in task['run_on_nodes']:
-                    if task['type'] == 'PingProbe':
-                        poller.add(PingProbe(task['dest_addr'],
-                                             recurrence_time=task['recurrence_time'],
-                                             recurrence_count=task['recurrence_count'],
-                                             run_on_nodes=task['run_on_nodes']))
-                    if task['type'] == 'TraceProbe':
-                        poller.add(TraceProbe(task['dest_addr'],
-                                              recurrence_time=task['recurrence_time'],
-                                              recurrence_count=task['recurrence_count'],
-                                              run_on_nodes=task['run_on_nodes']))
+            for probe in db_probes:
+                if 'trucks' in probe['run_on_nodes']:
+                    if probe['type'] == 'PingProbe':
+                        poller.add(PingProbe(probe['dest_addr'],
+                                             recurrence_time=probe['recurrence_time'],
+                                             recurrence_count=probe['recurrence_count'],
+                                             run_on_nodes=probe['run_on_nodes'],
+                                             probe_id=probe['_id']))
+                    if probe['type'] == 'TraceProbe':
+                        poller.add(TraceProbe(probe['dest_addr'],
+                                              recurrence_time=probe['recurrence_time'],
+                                              recurrence_count=probe['recurrence_count'],
+                                              run_on_nodes=probe['run_on_nodes']),
+                                              probe_id=probe['_id'])
             time.sleep(5)
     except KeyboardInterrupt:
         poller.stop()

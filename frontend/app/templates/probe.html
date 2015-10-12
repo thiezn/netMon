@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<h3>{{ task['_id'] }}</h3>
-<span class='small'><b>Type</b> {{ task['type'] }}</span>
+<h3>{{ probe['_id'] }}</h3>
+<span class='small'><b>Type</b> {{ probe['type'] }}</span>
 <BR><BR>
 
-{% if task['type'] == 'PingProbe' %}
+{% if probe['type'] == 'PingProbe' %}
 
 {{ chart|safe }}
 <BR><BR>
@@ -18,8 +18,8 @@
           <th>max</th>
           <th>error</th>
       </tr>
-{% if 'result' in task %}
-  {% for result in task['result'] %}
+{% if 'result' in probe %}
+  {% for result in probe['result'] %}
      <tr>
          <td>{{result['timestamp']}}</td>
          <td>{{result['min']}}</td>
@@ -34,9 +34,9 @@
   No results yet
 {% endif %}
 
-{% elif task['type'] == 'TraceProbe' %}
+{% elif probe['type'] == 'TraceProbe' %}
 
-  {% for result in task['result'] %}
+  {% for result in probe['result'] %}
   <table class="table table-striped">
       <caption>Timestamp {{ result['timestamp'] }}</caption>
       <tr>

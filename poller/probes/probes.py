@@ -27,6 +27,7 @@ class Probe:
         recurrence_count = kwargs.get('recurrence_count', None)
         self.run_on_nodes = kwargs.get('run_on_nodes', [])
         self.run_on_groups = kwargs.get('run_on_groups', [])
+        self.probe_id = kwargs.get('probe_id', None)
 
         if recurrence_count and not recurrence_time:
             raise ValueError('Can\'t create recurring probe without '
@@ -40,7 +41,6 @@ class Probe:
         self.name = self.__class__.__name__
         self.recurrence_time = recurrence_time
         self.recurrence_count = recurrence_count
-        self.probe_id = None
 
     def db_record(self):
         """ Should return what we want to write to the

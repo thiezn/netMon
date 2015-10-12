@@ -33,7 +33,7 @@ class LoginForm(Form):
     remember_me = BooleanField('Remember me', default=False)
 
 
-class TaskForm(Form):
+class ProbeForm(Form):
     name = StringField('name')
     probe_type = SelectField('Probe Type', default='PingProbe',
                              choices=[('PingProbe', 'Ping'),

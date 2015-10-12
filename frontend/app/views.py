@@ -1,7 +1,7 @@
 from flask import url_for, session, request, render_template, flash, redirect
 from app import app, db
 from app import hash_string
-from .forms import LoginForm, RegisterForm, TaskForm
+from .forms import LoginForm, RegisterForm, ProbeForm
 from .models import User
 from flask.ext.login import login_user, logout_user
 from flask.ext.login import current_user, login_required
@@ -17,33 +17,33 @@ import time
 # need to do a LOT of cleanup on the whole frontend
 # code as I was just a newbie when i wrote this stuff
 # now i'm at least an intermediate newbie at python :)
-# also need to merge the Task and NodeStorage classes
+# also need to merge the Probe and NodeStorage classes
 # so we don't have to setup two DB connections
 
-class TaskStorage:
+class ProbeStorage:
     def __init__(self, db_addr='127.0.0.1', db_port=27017):
         self.session = MongoClient(db_addr, db_port)
-        self.db = self.session.task_database
-        self.tasks = self.db.task_collection
-        self.task_ids = []
+        self.db = self.session.probe_database
+        self.probes = self.db.probe_collection
+        self.probe_ids = []
 
-    def add(self, task):
-        """ Adds a task Task to the database
+    def add(self, probe):
+        """ Adds a probe Probe to the database
 
         Args:
-            task: A dict representing a task object
+            probe: A dict representing a probe object
         return:
-            task_id: _id value of mongodb document
+            probe_id: _id value of mongodb document
         """
-        return self.tasks.insert_one(task).inserted_id
+        return self.probes.insert_one(probe).inserted_id
 
-    def get_tasks(self):
-        """ Prints out all tasks """
-        return self.tasks.find()
+    def get_probes(self):
+        """ Prints out all probes """
+        return self.probes.find()
 
-    def get_task(self, task_id):
-        """ Returns a single task """
-        return self.tasks.find_one({"_id": ObjectId(task_id)})
+    def get_probe(self, probe_id):
+        """ Returns a single probe """
+        return self.probes.find_one({"_id": ObjectId(probe_id)})
 
 
 class NodeStorage:
@@ -84,16 +84,16 @@ class NodeStorage:
         self.nodes.remove({"name": node_name})
 
 
-# Use a global variable for Task/NodeStorage, otherwise we need
+# Use a global variable for Probe/NodeStorage, otherwise we need
 # to setup a new connection to mongodb for each function
 
-task_storage = TaskStorage()
+probe_storage = ProbeStorage()
 node_storage = NodeStorage()
 
 
-@app.route('/tasks/add', methods=['GET', 'POST'])
-def add_task():
-    """ Add a task to the database
+@app.route('/probes/add', methods=['GET', 'POST'])
+def add_probe():
+    """ Add a probe to the database
 
     PingProbe can have the following values:
                 'type'
@@ -115,9 +115,9 @@ def add_task():
                 'max_hops'
     """
     if request.method == 'POST':
-        form = TaskForm(request.form)
+        form = ProbeForm(request.form)
         if form.validate():
-            task = {'run_at': time.time(),
+            probe = {'run_at': time.time(),
                     'type': form.data['probe_type'],
                     'recurrence_time': form.recurrence_time.data,
                     'recurrence_count': form.recurrence_count.data,
@@ -125,46 +125,46 @@ def add_task():
                     'dest_addr': form.dest_addr.data,
                     'run_on_nodes': form.run_on_nodes.data.split(',')}
             if form.probe_type == 'PingProbe':
-                task['timeout'] = 1
-                task['count'] = 10
-                task['preload'] = 10
+                probe['timeout'] = 1
+                probe['count'] = 10
+                probe['preload'] = 10
             elif form.probe_type == 'TraceProbe':
-                task['wait_time'] = 1
-                task['max_hops'] = 20
+                probe['wait_time'] = 1
+                probe['max_hops'] = 20
 
-            task['_id'] = task_storage.add(task)
-            return render_template('task_added.html',
+            probe['_id'] = probe_storage.add(probe)
+            return render_template('probe_added.html',
                                    form=form,
-                                   title="Task added",
-                                   task=task)
-        return render_template('add_task.html',
+                                   title="Probe added",
+                                   probe=probe)
+        return render_template('add_probe.html',
                                form=form,
-                               title='Task added')
+                               title='Probe added')
     else:
-        return render_template('add_task.html',
-                               form=TaskForm(),
-                               title="Add Task")
+        return render_template('add_probe.html',
+                               form=ProbeForm(),
+                               title="Add Probe")
 
 
-@app.route('/tasks')
-def tasks():
-    result = task_storage.get_tasks()
+@app.route('/probes')
+def probes():
+    result = probe_storage.get_probes()
 
-    tasks = []
-    for task in result:
-        tasks.append(task)
+    probes = []
+    for probe in result:
+        probes.append(probe)
 
-    return render_template("tasks.html", tasks=tasks)
+    return render_template("probes.html", probes=probes)
 
 
-@app.route('/task/<task_id>')
-def task(task_id):
-    task = task_storage.get_task(task_id)
+@app.route('/probe/<probe_id>')
+def probe(probe_id):
+    probe = probe_storage.get_probe(probe_id)
 
     chart = None
 
-    if(task['type'] == "PingProbe" and
-       'result' in task):
+    if(probe['type'] == "PingProbe" and
+       'result' in probe):
         chart = lineChart(name="lineChart",
                           x_is_date=True,
                           x_axis_format="%d-%m-%y %H:%M:%S",
@@ -173,7 +173,7 @@ def task(task_id):
         min_data = []
         avg_data = []
         max_data = []
-        for result in task['result']:
+        for result in probe['result']:
             if 'error' in result:
                 # TODO, need to take into account that some probes
                 # give an error and some don't This just assumes
@@ -198,11 +198,11 @@ def task(task_id):
         chart = chart.htmlcontent
 
         # convert timestamps for pretty printing
-        for item in task['result']:
+        for item in probe['result']:
             item['timestamp'] = format(datetime.fromtimestamp(item['timestamp']),
                                        '%d-%b-%y - %H:%M:%S')
 
-    return render_template("task.html", task=task, chart=chart)
+    return render_template("probe.html", probe=probe, chart=chart)
 
 
 @app.route('/', methods=['GET', 'POST'])

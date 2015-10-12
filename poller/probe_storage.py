@@ -45,7 +45,6 @@ class ProbeStorage:
         """
         logger.info('updating probe_id {} with result {}'
                     .format(probe.probe_id, probe))
-
         self.probes.update_one({'_id': probe.probe_id},
                                {'$addToSet': {'result': probe.result}},
                                upsert=upsert)

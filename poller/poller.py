@@ -21,6 +21,7 @@ class Poller:
         self._probe_result_queue = queue.Queue()
         self.probe_storage = ProbeStorage()
         self.probe_storage.clear_db()
+        self.probe_list = []
 
     def __repr__(self):
         """ Print the current queue contents """
@@ -50,11 +51,17 @@ class Poller:
 
     def add(self, probe):
         """ Adds a new probe to the queue """
-        logger.debug('Probe {} added to the poller queue'
-                     .format(probe.name))
-        if not self.probe_storage.check_if_exists(probe):
+
+        if not probe.probe_id:
+            logger.debug('Probe {} added to the database'
+                         .format(probe.name))
             probe.probe_id = self.probe_storage.add(probe)
+
+        if probe.run_at not in self.probe_list:
+            logger.debug('Probe {} added to the poller queue'
+                         .format(probe.name))
             self._probe_queue.put(probe)
+            self.probe_list.append(probe.run_at)
 
     def _probe_result_handler(self):
         """ Handles received probe results """
@@ -75,7 +82,6 @@ class Poller:
                 # Check if the probe should be run already
                 # If not, add it to the back of the queue
                 if current_probe.run_at <= time.time():
-
                     result = current_probe.run()
                     if result:
                         self._probe_result_queue.put(current_probe)

@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
-<form action="{{url_for('add_task')}}" class="form-horizontal" method="POST">
+<form action="{{url_for('add_probe')}}" class="form-horizontal" method="POST">
         {{ form.hidden_tag() }}
         <div class="heading">
-          <h4 class="form-heading">Add a task</h4>
+          <h4 class="form-heading">Add a probe</h4>
         </div>
 
         <div class="form-group {% if form.name.errors %} has-error {% endif %}">
@@ -51,7 +51,7 @@
           {{ form.run_on_nodes.errors[0] }}
         </div>
 
-        <button class="btn btn-success" type="submit">Add Task</button>
+        <button class="btn btn-success" type="submit">Add Probe</button>
 </form>
 {% endblock %}
 
