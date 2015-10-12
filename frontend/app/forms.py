@@ -41,5 +41,6 @@ class TaskForm(Form):
     dest_addr = StringField('Destination Address',
                             validators=[DataRequired('Invalid IP')])
     run_at = DateTimeField('Run at')
+    run_on_nodes = StringField('Run on nodes (seperate with ,)')
     recurrence_count = IntegerField('How often should this reoccur')
     recurrence_time = IntegerField('Reoccur every x seconds')

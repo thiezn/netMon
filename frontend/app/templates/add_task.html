@@ -42,6 +42,15 @@
           {{ form.recurrence_time.errors[0] }}
         </div>
 
+          <div class="form-group {% if form.run_on_nodes.errors %} has-error {% endif %}">
+          {{ form.run_on_nodes.label(class="col-sm-4") }}
+          <div class="col-sm-3">
+            {{ form.run_on_nodes(class="form-control") }}
+          </div>
+          <p class="col-sm-5 help-block">
+          {{ form.run_on_nodes.errors[0] }}
+        </div>
+
         <button class="btn btn-success" type="submit">Add Task</button>
 </form>
 {% endblock %}

@@ -10,6 +10,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from nvd3 import lineChart
 from datetime import datetime
+import time
 
 
 # Lets get this stuff loaded here quickly,
@@ -116,11 +117,13 @@ def add_task():
     if request.method == 'POST':
         form = TaskForm(request.form)
         if form.validate():
-            task = {'type': form.data['probe_type'],
+            task = {'run_at': time.time(),
+                    'type': form.data['probe_type'],
                     'recurrence_time': form.recurrence_time.data,
                     'recurrence_count': form.recurrence_count.data,
-                    'run_at': form.run_at.data,
-                    'dest_addr': form.dest_addr.data}
+                    # 'run_at': form.run_at.data,
+                    'dest_addr': form.dest_addr.data,
+                    'run_on_nodes': form.run_on_nodes.data.split(',')}
             if form.probe_type == 'PingProbe':
                 task['timeout'] = 1
                 task['count'] = 10

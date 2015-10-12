@@ -6,6 +6,7 @@
   <tr>
     <th>task_id</th>
     <th>type</th>
+    <th>destination</th>
     <th>first run</th>
     <th>recurrence</th>
     <th>recurrence time (sec)</th>
@@ -16,6 +17,7 @@
   <tr>
       <td><a href='{{ url_for('task', task_id=task['_id']) }}'>{{task['_id']}}</a></td>
       <td>{{task['type']}}</td>
+      <td>{{task['dest_addr']}}</td>
       <td>{{task['run_at']}}</td>
       {% if task['recurrence_time'] and not task['recurrence_count'] %}
         <td>persistent</td>
