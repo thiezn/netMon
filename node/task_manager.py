@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from config_manager import Configuration
 from threading import Thread
 from tcp_client import MessageHandler
 import queue
@@ -14,10 +13,9 @@ logger = logging.getLogger(__name__)
 
 class TaskManager:
 
-    def __init__(self):
+    def __init__(self, node_details):
         """ Initialising the task_queue and task_result_queue """
-        config = Configuration()
-        self.node_details = config.load_node_main()
+        self.node_details = node_details
 
         self._task_queue = queue.Queue()
         self._task_result_queue = queue.Queue()

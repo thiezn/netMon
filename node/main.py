@@ -6,7 +6,7 @@ from probes.trace_probe import TraceProbe
 from probes.ping_probe import PingProbe
 from task_storage import TaskStorage
 import time
-
+from config_manager import Configuration
 
 def main():
     logging.basicConfig(filename='log.main',
@@ -14,8 +14,12 @@ def main():
                         filemode='w',
                         format='%(asctime)s %(levelname)s %(message)s')
 
+    logging.info('Loading local configration...')
+    config = Configuration()
+    node_details = config.load_node_main()
+
     logging.info('Loading task_manager...')
-    task_manager = TaskManager()
+    task_manager = TaskManager(node_details)
 
     logging.info('Setting up task storage db...')
     task_storage = TaskStorage()
@@ -35,7 +39,7 @@ def main():
             # e.g. task_manager.add(IcmpProbe('127.0.0.1'))
             db_tasks = task_storage.get_tasks()
             for task in db_tasks:
-                if 'trucks' in task['run_on_nodes']:
+                if node_details['name'] in task['run_on_nodes']:
                     if task['type'] == 'PingProbe':
                         task_manager.add(PingProbe(task['dest_addr'],
                                          recurrence_time=task['recurrence_time'],
