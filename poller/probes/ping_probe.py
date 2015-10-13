@@ -21,10 +21,14 @@ class PingProbe(Probe):
 
         super().__init__(*args, **kwargs)
         self.dest_addr = dest_addr
-        ipaddress.ip_address(dest_addr)  # Check if we have valid ip
         self.count = count
         self.preload = preload
         self.timeout = timeout
+
+        try:
+            ipaddress.ip_address(dest_addr)  # Check if we have valid ip
+        except ValueError:
+            dest_addr = '0.0.0.0'
 
     def db_record(self):
         """ Should return what we want to write to the
@@ -85,5 +89,4 @@ class PingProbe(Probe):
                            'mdev': last_line[3],
                            'packets_sent': second_last_line[0],
                            'packets_recv': second_last_line[3]}
-
         return True

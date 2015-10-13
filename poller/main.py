@@ -19,16 +19,18 @@ def main():
 
     logging.info('Setting up probe storage db...')
     probe_storage = ProbeStorage()
-    probe_storage.clear_db()
+    # probe_storage.clear_db()
 
     poller.start()
 
     try:
+        """
         poller.add(PingProbe('149.210.184.36',
                              recurrence_time=1,
                              run_on_nodes=['trucks']))
         poller.add(TraceProbe('8.8.8.8', recurrence_time=3))
         poller.add(PingProbe('10.0.0.1', run_on_nodes=['miles']))
+        """
 
         while True:
             # Here we can send probes to the poller

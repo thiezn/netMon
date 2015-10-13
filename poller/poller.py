@@ -5,8 +5,15 @@ import queue
 import time
 import logging
 from probe_storage import ProbeStorage
+from datetime import datetime
+
 
 logger = logging.getLogger(__name__)
+
+
+def pretty_time(timestamp):
+    """ convert timestamp for pretty printing """
+    return datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
 
 class Poller:
@@ -20,7 +27,6 @@ class Poller:
         self._probe_queue = queue.Queue()
         self._probe_result_queue = queue.Queue()
         self.probe_storage = ProbeStorage()
-        self.probe_storage.clear_db()
         self.probe_list = []
 
     def __repr__(self):
@@ -57,18 +63,22 @@ class Poller:
                          .format(probe.name))
             probe.probe_id = self.probe_storage.add(probe)
 
-        if probe.run_at not in self.probe_list:
+        if probe.probe_id not in self.probe_list:
             logger.debug('Probe {} added to the poller queue'
                          .format(probe.name))
             self._probe_queue.put(probe)
-            self.probe_list.append(probe.run_at)
+            self.probe_list.append(probe.probe_id)
 
     def _probe_result_handler(self):
         """ Handles received probe results """
         while True:
             while not self._probe_result_queue.empty():
                 probe = self._probe_result_queue.get()
-                print("Updating probe ID {}".format(probe.probe_id))
+                print("Updating probe ID {}, "
+                      "address {}, "
+                      "run_at {}".format(probe.probe_id,
+                                         probe.dest_addr,
+                                         pretty_time(probe.run_at)))
                 self.probe_storage.update(probe)
 
     def _poller(self):
