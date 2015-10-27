@@ -6,7 +6,19 @@
 <span class='small'><b>Type</b> {{ probe['type'] }}</span>
 <BR><BR>
 
-{% if probe['type'] == 'PingProbe' %}
+{% if probe['type'] == 'HttpProbe' %}
+
+Destination {{probe['dest_url']}}
+<BR><BR>
+  <table class="table table-striped">
+      <tr>
+          <th>timestamp</th>
+          <th>response time</th>
+          <th>status code</th>
+      </tr>
+  </table>
+
+{% elif probe['type'] == 'PingProbe' %}
 
 {{ chart|safe }}
 <BR><BR>
