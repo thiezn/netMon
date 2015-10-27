@@ -75,9 +75,7 @@ class Poller:
             while not self._probe_result_queue.empty():
                 probe = self._probe_result_queue.get()
                 print("Updating probe ID {}, "
-                      "address {}, "
                       "run_at {}".format(probe.probe_id,
-                                         probe.dest_addr,
                                          pretty_time(probe.run_at)))
                 self.probe_storage.update(probe)
 

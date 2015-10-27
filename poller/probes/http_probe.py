@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import probes
+from .probes import Probe
 import requests
 from time import time
 
 
-class HttpProbe(probes.Probe):
+class HttpProbe(Probe):
     """ Runs a HTTP probe to the provided destination """
 
     def __init__(self, dest_url, *args, **kwargs):
@@ -21,6 +21,7 @@ class HttpProbe(probes.Probe):
         super().__init__(*args, **kwargs)
         self.dest_url = dest_url
         self.session = requests.session()
+        self.result = {}
 
     def db_record(self):
         """ Should return what we want to write to the
@@ -32,9 +33,7 @@ class HttpProbe(probes.Probe):
                 "run_at": self.run_at,
                 "run_on_nodes": self.run_on_nodes,
                 "run_on_groups": self.run_on_groups,
-                "dest_url": self.dest_url,
-                "status_code": self.status_code,
-                "call_duration": self._call_duration}
+                "dest_url": self.dest_url}
 
     def run(self):
         return self.http_get()
@@ -52,17 +51,14 @@ class HttpProbe(probes.Probe):
         self._call_duration = time() - _start_time
         self.status_code = response.status_code
 
-        if response.status_code == 200:
-            return True
-        else:
-            return False
+        self.result = {'status_code': response.status_code,
+                       'data': response.text}
 
 
 if __name__ == '__main__':
     probe = HttpProbe('http://www.mortimer.nl/')
     probe.run()
     print(probe.db_record())
-
 
     probe = HttpProbe('http://85.119.21.16')
     probe.run()

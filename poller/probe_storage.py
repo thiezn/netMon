@@ -60,4 +60,5 @@ class ProbeStorage:
 
 if __name__ == '__main__':
     probe_storage = ProbeStorage()
-    probe_storage.get_probes()
+    for probe in probe_storage.get_probes():
+        print("%s\n" % probe['type'])
